@@ -9,7 +9,6 @@ const TestModelScreen: React.FC = () => {
   const [models, setModels] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch initial model data when component mounts
     fetchInitialModelData();
   }, []);
 
@@ -26,7 +25,7 @@ const TestModelScreen: React.FC = () => {
     setPickerVisible(!pickerVisible);
     if (!pickerVisible) {
       try {
-        // Fetch the updated data when the picker is closed
+        // Fetches the Updated data 
         const newData = await fetchModels();
         setModels(newData);
       } catch (error) {
@@ -37,7 +36,7 @@ const TestModelScreen: React.FC = () => {
 
   const handleSelectModel = (model: any) => {
     setSelectedModel(model);
-    togglePicker(); // Close the picker after selecting a model
+    togglePicker();
   };
 
   return (
@@ -49,6 +48,7 @@ const TestModelScreen: React.FC = () => {
           models={models}
         />
       )}
+      
       {/* To display the name of selected Model */}
       <Text style={styles.selectedModel}>
         Selected Model: {selectedModel ? selectedModel.name : 'None'}
