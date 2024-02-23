@@ -1,9 +1,8 @@
-// App.tsx
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import TestModelScreen from './src/screens/TestModelScreen';
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <View style={styles.container}>
       <TestModelScreen />
@@ -14,7 +13,8 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
+    marginTop: 20,
+  }
 });
 
 export default App;
