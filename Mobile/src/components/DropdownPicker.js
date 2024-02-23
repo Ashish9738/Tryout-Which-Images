@@ -39,9 +39,9 @@ const DropdownPicker = ({ onSelect }) => {
           onValueChange={handleModelChange}
           style={styles.dropdown}
         >
-          {models.map((model) => (
+        {models.map((model) => (
             <Picker.Item key={model.id} label={model.name} value={model.name} />
-          ))}
+        ))}
         </Picker>
       </View>
     </View>
@@ -50,13 +50,21 @@ const DropdownPicker = ({ onSelect }) => {
 
 const styles = StyleSheet.create({
   container: {
+    marginLeft : 12,
     marginVertical: 10,
   },
   label: {
+    marginTop: 8,
     fontSize: 18,
     marginBottom: 5,
+    textAlign: 'center',
   },
   dropdownContainer: {
+    display : 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 2,
+    marginRight: 8,
     borderWidth: 1,
     borderRadius: 5,
     borderColor: '#ccc',
