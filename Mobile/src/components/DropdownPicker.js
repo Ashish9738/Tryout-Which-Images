@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   dropdownContainer: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 5,
     borderColor: '#ccc',
     overflow: 'hidden', // Hide overflow for rounded corners
