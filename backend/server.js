@@ -32,6 +32,7 @@ const wss = new WebSocket.Server({ port: 8082 });
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
 
+  //console logging the feedback from the response of the feedback
   ws.on('message', function incoming(message) {
     console.log('Received feedback:', message.toString('utf8'));
   });
