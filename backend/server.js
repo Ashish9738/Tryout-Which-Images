@@ -4,11 +4,11 @@ const cors = require('cors');
 const fs = require('fs');
 
 const app = express();
-const port = 8080;
+const port = process.env.PORT || 8080;
 
 const readModelData = () => {
   try {
-    const data = fs.readFileSync('models.json', 'utf8');
+    const data = fs.readFileSync('./models/models.json', 'utf8');
     return JSON.parse(data);
   } catch (error) {
     console.error('Error reading models.json:', error);
@@ -16,10 +16,32 @@ const readModelData = () => {
   }
 };
 
+const readQuestionsData = () => {
+  try {
+    const data = fs.readFileSync('./models/questions.json', 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading questions.json:', error);
+    return [];
+  }
+};
+
+// Setting up the WebSocket Connection
 const wss = new WebSocket.Server({ port: 8082 });
 
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
+
+  ws.on('message', function incoming(message) {
+    console.log('Received feedback:', message.toString('utf8'));
+  });
+  
+
+  const models = readModelData();
+  ws.send(JSON.stringify(models));
+
+  const questions = readQuestionsData();
+  ws.send(JSON.stringify(questions));
 
   ws.on('close', function() {
     console.log('Client disconnected');
@@ -30,20 +52,17 @@ wss.on('connection', function connection(ws) {
   });
 });
 
-const sendModelData = () => {
-  const models = readModelData();
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify(models));
-    }
-  });
-};
-
 app.use(cors());
 
+// Routes for fetching
 app.get('/model', (req, res) => {
   const models = readModelData();
   res.json(models);
+});
+
+app.get('/questions', (req, res) => {
+  const questions = readQuestionsData();
+  res.json(questions);
 });
 
 const server = app.listen(port, () => {
@@ -56,7 +75,13 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
-fs.watch('models.json', (eventType, filename) => {
+// Watch for changes in the Model data
+fs.watch('./models/models.json', (eventType, filename) => {
   console.log(`File ${filename} changed. Reloading model data...`);
-  sendModelData(); 
+  const models = readModelData();
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(JSON.stringify(models));
+    }
+  });
 });

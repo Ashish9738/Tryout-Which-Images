@@ -63,7 +63,12 @@ const DropDown: React.FC = () => {
 
   return (
     <View>
-      <Button title="Select Model" onPress={togglePicker} />
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Select Model"
+          onPress={togglePicker}
+        />
+      </View>
       {pickerVisible && (
         <TestModelScreen
           onSelect={handleSelectModel}
@@ -85,6 +90,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
     color: 'black',
+  },
+  buttonContainer: {
+    marginLeft: 10,
+    marginRight: 10,
   },
 });
 
