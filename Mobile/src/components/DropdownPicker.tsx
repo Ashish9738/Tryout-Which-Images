@@ -1,5 +1,6 @@
+// DropdownPicker.tsx
 import React from 'react';
-import { View} from 'react-native';
+import { View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 interface Props {
@@ -12,8 +13,9 @@ const DropdownPicker: React.FC<Props> = ({ onSelect, models }) => {
     <View>
       <Picker
         selectedValue={null}
-        onValueChange={(itemValue) => onSelect(itemValue)}
+        onValueChange={(itemValue: any) => onSelect(itemValue)}
       >
+        <Picker.Item label="Select the Model" value={null} />
         {models.map((model) => (
           <Picker.Item key={model.id} label={model.name} value={model} />
         ))}

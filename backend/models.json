@@ -1,21 +1,22 @@
 [
       {
         "id": 1,
-        "name": "Select a Model",
-        "version": "1.0",
-        "description": "Description of Model A"
-      },
-      {
-        "id": 2,
         "name": "Elephant Ear",
         "version": "1.0",
         "description": "Description of Model A"
       },
-      {
-        "id": 3,
-        "name": "Elephant trunk",
-        "version": "1.0",
-        "description": "Description of Model A"
-      }
+        {
+          "id": 2,
+          "name": "Elephant Tail",
+          "version": "1.0",
+          "description": "Description of Model A"
+        },
+        {
+          "id": 3,
+          "name": "Elephant face",
+          "version": "1.0",
+          "description": "Description of Model A"
+        }
+      
   ]
   

@@ -6,7 +6,6 @@ const fs = require('fs');
 const app = express();
 const port = 8080;
 
-
 const readModelData = () => {
   try {
     const data = fs.readFileSync('models.json', 'utf8');
@@ -17,9 +16,7 @@ const readModelData = () => {
   }
 };
 
-
-const wss = new WebSocket.Server({ noServer: true });
-app.use(cors());
+const wss = new WebSocket.Server({ port: 8082 });
 
 wss.on('connection', function connection(ws) {
   console.log('Client connected');
@@ -33,7 +30,6 @@ wss.on('connection', function connection(ws) {
   });
 });
 
-// Sends the Model data to Client
 const sendModelData = () => {
   const models = readModelData();
   wss.clients.forEach(client => {
@@ -43,14 +39,15 @@ const sendModelData = () => {
   });
 };
 
-//serves the Model data 
-app.get('/api/model', (req, res) => {
+app.use(cors());
+
+app.get('/model', (req, res) => {
   const models = readModelData();
   res.json(models);
 });
 
 const server = app.listen(port, () => {
-  console.log(`Server listening at http://localHost:${port}`);
+  console.log(`Server listening at http://192.168.43.47:${port}`);
 });
 
 server.on('upgrade', (request, socket, head) => {
@@ -59,7 +56,6 @@ server.on('upgrade', (request, socket, head) => {
   });
 });
 
-// Watchs the changes to models.json file
 fs.watch('models.json', (eventType, filename) => {
   console.log(`File ${filename} changed. Reloading model data...`);
   sendModelData(); 

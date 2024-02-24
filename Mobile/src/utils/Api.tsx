@@ -1,6 +1,7 @@
+// frontend/utils/Api.tsx
 export const fetchModels = async (): Promise<any[]> => {
   try {
-    const response = await fetch('http://localHost/api/model');
+    const response = await fetch('http://192.168.43.47:8080/model');
     if (!response.ok) {
       throw new Error('Failed to fetch models');
     }
