@@ -1,90 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Button, Text, StyleSheet } from 'react-native';
-import DropdownPicker from '../DropdownPicker';
-import { fetchModels } from '../utils/Api';
+import React from 'react';
+import { View } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 
-const TestModelScreen: React.FC = () => {
-  const [pickerVisible, setPickerVisible] = useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState<any>(null);
-  const [models, setModels] = useState<any[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
+interface Props {
+  onSelect: (model: any) => void;
+  models: any[];
+}
 
-  useEffect(() => {
-    setupWebSocket();
-    fetchInitialModelData();
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, []);
-
-  const fetchInitialModelData = async () => {
-    try {
-      const data = await fetchModels();
-      setModels(data);
-    } catch (error) {
-      console.error('Error fetching initial model data:', error);
-    }
-  };
-
-  const setupWebSocket = () => {
-    const newWs = new WebSocket('ws://192.168.43.47:8082');
-
-    newWs.onopen = () => {
-      console.log('Connected to WebSocket server');
-    };
-
-    newWs.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      setModels(newData);
-    };
-
-    newWs.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    newWs.onclose = () => {
-      console.log('WebSocket connection closed');
-      // Attempt to reconnect after a delay
-      setTimeout(setupWebSocket, 3000);
-    };
-
-    setWs(newWs);
-  };
-
-  const togglePicker = () => {
-    setPickerVisible(!pickerVisible);
-  };
-
-  const handleSelectModel = (model: any) => {
-    setSelectedModel(model);
-    togglePicker();
-  };
-
+const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
   return (
     <View>
-      <Button title="Select Model" onPress={togglePicker} />
-      {pickerVisible && (
-        <DropdownPicker
-          onSelect={handleSelectModel}
-          models={models}
-        />
-      )}
-      <Text style={styles.selectedModel}>
-        Selected Model: {selectedModel ? selectedModel.name : 'None'}
-      </Text>
+      <Picker
+        selectedValue={null}
+        onValueChange={(itemValue: any) => onSelect(itemValue)}
+      >
+        <Picker.Item label="Select the Model" value={null} />
+        {models.map((model) => (
+          <Picker.Item key={model.id} label={model.name} value={model} />
+        ))}
+      </Picker>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  selectedModel: {
-    fontSize: 18,
-    textAlign: 'center',
-    marginTop: 10,
-    color: 'black',
-  },
-});
 
 export default TestModelScreen;

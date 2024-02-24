@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import TestModelScreen from './src/components/DropDown/screens/TestModelScreen';
+import DropDown from './src/components/DropDown/DropDown';
 import Feedback from './src/components/Feedback/Feedback';
 
 const App: React.FC = () => {
   return (
     <View style={styles.container}>
-      <TestModelScreen />
+      <DropDown />
       <Feedback />
     </View>
   );
