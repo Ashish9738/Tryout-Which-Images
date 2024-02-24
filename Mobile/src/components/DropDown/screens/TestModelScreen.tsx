@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
-import DropdownPicker from '../components/DropdownPicker';
+import DropdownPicker from '../DropdownPicker';
 import { fetchModels } from '../utils/Api';
 
 const TestModelScreen: React.FC = () => {

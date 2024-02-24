@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import TestModelScreen from './src/screens/TestModelScreen';
+import TestModelScreen from './src/components/DropDown/screens/TestModelScreen';
 
 const App: React.FC = () => {
   return (
