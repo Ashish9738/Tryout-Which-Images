@@ -80,7 +80,7 @@ const DropDown: React.FC = () => {
 
       {/* To display the Model which is been selected */}
       <Text style={styles.selectedModel}>
-        Selected Model: {selectedModel ? selectedModel.names[0] : 'None'}
+        Selected Model: {selectedModel ? selectedModel.name : 'None'}
       </Text>
 
       {/* Display error message if there's an error */}

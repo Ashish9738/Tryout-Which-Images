@@ -8,6 +8,10 @@ interface Props {
 }
 
 const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
+  if (!models || !Array.isArray(models)) {
+    return <View>No models available</View>;
+  }
+
   return (
     <View>
       <Picker
@@ -15,8 +19,8 @@ const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
         onValueChange={(itemValue: any) => onSelect(itemValue)}
       >
         <Picker.Item label="Select the Model" value={null} />
-        {models.map((model, index) => (
-          <Picker.Item key={index} label={model.names[index.toString()]} value={model} />
+        {models.map((model) => (
+          <Picker.Item key={model.id} label={model.name} value={model} />
         ))}
       </Picker>
     </View>
