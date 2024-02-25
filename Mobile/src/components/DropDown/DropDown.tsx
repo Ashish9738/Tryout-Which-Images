@@ -8,6 +8,7 @@ const DropDown: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setupWebSocket();
@@ -25,6 +26,7 @@ const DropDown: React.FC = () => {
       setModels(data);
     } catch (error) {
       console.error('Error fetching initial model data:', error);
+      setError('Error fetching models. Please try again.');
     }
   };
 
@@ -78,8 +80,11 @@ const DropDown: React.FC = () => {
 
       {/* To display the Model which is been selected */}
       <Text style={styles.selectedModel}>
-        Selected Model: {selectedModel ? selectedModel.name : 'None'}
+        Selected Model: {selectedModel ? selectedModel.names[0] : 'None'}
       </Text>
+
+      {/* Display error message if there's an error */}
+      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 };
@@ -94,6 +99,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginLeft: 10,
     marginRight: 10,
+  },
+  error: {
+    fontSize: 16,
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 

@@ -15,8 +15,8 @@ const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
         onValueChange={(itemValue: any) => onSelect(itemValue)}
       >
         <Picker.Item label="Select the Model" value={null} />
-        {models.map((model) => (
-          <Picker.Item key={model.id} label={model.name} value={model} />
+        {models.map((model, index) => (
+          <Picker.Item key={index} label={model.names[index.toString()]} value={model} />
         ))}
       </Picker>
     </View>
