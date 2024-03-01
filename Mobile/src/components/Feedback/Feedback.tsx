@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Text, View, Button} from 'react-native';
 import {RadioButton} from 'react-native-paper';
-import { api } from '../DropDown/utils/Api';
+import {api} from '../DropDown/utils/Api';
 
 interface FeedbackProps {}
 
@@ -17,7 +17,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`${api}/questions`);
+      const response = await fetch(`${api}/feedback`);
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
@@ -41,7 +41,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   const submitFeedback = async () => {
     try {
-      const response = await fetch(`${api}/questions`, {
+      const response = await fetch(`${api}/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

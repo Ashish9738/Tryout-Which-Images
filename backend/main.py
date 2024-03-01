@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from ast import List
+from fastapi import Body, FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel  # Import BaseModel for defining models
+from pydantic import BaseModel 
 import json
 
 app = FastAPI()
@@ -14,7 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Define the Feedback model
 class Feedback(BaseModel):
     question_id: str
     feedback: str
@@ -42,13 +42,13 @@ async def read_models():
     models = read_model_data()
     return JSONResponse(content=models)
 
-@app.get("/questions")
+@app.get("/feedback")
 async def read_questions():
     questions = read_questions_data()
     return JSONResponse(content=questions)
 
-@app.post("/questions")
-async def create_question():
+@app.post("/feedback")
+async def recieving_feedback():
     return {"message": "Question received successfully"}
 
 
