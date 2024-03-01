@@ -1,57 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
 import TestModelScreen from './screens/TestModelScreen';
 import { fetchModels } from './utils/Api';
+import { io, Socket } from 'socket.io-client';
 
 const DropDown: React.FC = () => {
   const [pickerVisible, setPickerVisible] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
-  const [ws, setWs] = useState<WebSocket | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const socketRef = useRef<Socket | null>(null);
+  
   useEffect(() => {
-    setupWebSocket();
+    console.log("Setting up socket...");
+    setupSocket();
+    console.log("Not entering into socket func.")
     fetchInitialModelData();
     return () => {
-      if (ws) {
-        ws.close();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
       }
     };
   }, []);
-
+  
   const fetchInitialModelData = async () => {
     try {
       const data = await fetchModels();
+      console.log(data);
       setModels(data);
     } catch (error) {
-      console.error('Error fetching initial model data:', error);
-      setError('Error fetching models. Please try again.');
+      if (error instanceof Error) {
+        console.error('Error fetching initial model data:', error);
+        setError(`Error fetching models: ${error.message}`);
+      } else {
+        console.error('Unknown error fetching initial model data:', error);
+        setError('Unknown error fetching models. Please try again.');
+      }
     }
   };
 
-  const setupWebSocket = () => {
-    const newWs = new WebSocket('ws://192.168.43.47:8082');
+  const setupSocket = () => {
+    if (!socketRef.current) {
+      const socket = io('http://127.0.0.1:8000');
+      socketRef.current = socket;
 
-    newWs.onopen = () => {
-      console.log('Connected to WebSocket server');
-    };
+      socket.on('connect', () => {
+        console.log('Connected to WebSocket server');
+      });
 
-    newWs.onmessage = (event) => {
-      const newData = JSON.parse(event.data);
-      setModels(newData);
-    };
+      socket.on('models', (data) => {
+        try {
+          setModels(data);
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      });
 
-    newWs.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
+      socket.on('error', (error) => {
+        console.error('WebSocket error:', error);
+        setError('WebSocket error occurred. Please try again.');
+      });
 
-    newWs.onclose = () => {
-      console.log('WebSocket connection closed');
-      setTimeout(setupWebSocket, 3000);
-    };
-
-    setWs(newWs);
+      socket.on('disconnect', () => {
+        console.log('WebSocket connection closed');
+        setTimeout(setupSocket, 5000);
+      });
+    }
   };
 
   const togglePicker = () => {

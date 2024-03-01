@@ -1,5 +1,5 @@
-import React from 'react';
-import { View } from 'react-native';
+import * as React from 'react';
+import { Text, View } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 
 interface Props {
@@ -8,8 +8,8 @@ interface Props {
 }
 
 const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
-  if (!models || !Array.isArray(models)) {
-    return <View>No models available</View>;
+  if (!models || models.length === 0) {
+    return <View><Text>No models available</Text></View>;
   }
 
   return (

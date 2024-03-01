@@ -1,12 +1,12 @@
 export const fetchModels = async (): Promise<any[]> => {
   try {
-    const response = await fetch('http://192.168.43.47:8080/model');
+    const response = await fetch('http://127.0.0.1:8000/model');
     if (!response.ok) {
       throw new Error('Failed to fetch models');
     }
-    const data: any[] = await response.json();
+    const data = await response.json();
     return data;
-  } catch (error: unknown) {
+  } catch (error: any) { 
     if (error instanceof Error) {
       throw new Error(`Error fetching models: ${error.message}`);
     } else {
