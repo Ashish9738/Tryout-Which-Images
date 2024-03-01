@@ -1,13 +1,10 @@
-import eventlet
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel  # Import BaseModel for defining models
 import json
-from socketio import AsyncServer
-import socketio
 
 app = FastAPI()
-sio = AsyncServer(async_mode='asgi', cors_allowed_origins="*")
 
 app.add_middleware(
     CORSMiddleware,
@@ -16,6 +13,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Define the Feedback model
+class Feedback(BaseModel):
+    question_id: str
+    feedback: str
 
 def read_model_data():
     try:
@@ -35,18 +37,8 @@ def read_questions_data():
         print('Error reading questions.json:', e)
         return []
 
-@sio.on('connect')
-async def websocket_connect(sid, environ):
-    print(f"Client connected: {sid}")
-    await sio.emit("models", read_model_data(), room=sid)
-    await sio.emit("questions", read_questions_data(), room=sid)
-
-@sio.on('disconnect')
-async def websocket_disconnect(sid):
-    print(f"Client disconnected: {sid}")
-
-@app.get("/model")
-async def read_model():
+@app.get("/models")
+async def read_models():
     models = read_model_data()
     return JSONResponse(content=models)
 
@@ -55,8 +47,8 @@ async def read_questions():
     questions = read_questions_data()
     return JSONResponse(content=questions)
 
-# Mount Socket.IO application
-app.mount("/socket.io", socketio.ASGIApp(sio))
+@app.post("/questions")
+async def create_question():
+    return {"message": "Question received successfully"}
 
-if __name__ == "__main__":
-    eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 8000)), app)
+

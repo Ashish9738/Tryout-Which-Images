@@ -7,7 +7,7 @@ const App: React.FC = () => {
   return (
     <View style={styles.container}>
       <DropDown />
-      {/* <Feedback /> */}
+      <Feedback />
     </View>
   );
 };

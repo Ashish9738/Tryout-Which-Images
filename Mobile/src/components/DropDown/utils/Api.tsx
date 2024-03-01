@@ -1,12 +1,14 @@
+export const api = 'http://10.0.2.2:8000';
+
 export const fetchModels = async (): Promise<any[]> => {
   try {
-    const response = await fetch('http://127.0.0.1:8000/model');
+    const response = await fetch(`${api}/models`);
     if (!response.ok) {
       throw new Error('Failed to fetch models');
     }
     const data = await response.json();
     return data;
-  } catch (error: any) { 
+  } catch (error: any) {
     if (error instanceof Error) {
       throw new Error(`Error fetching models: ${error.message}`);
     } else {

@@ -1,47 +1,14 @@
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Button, Text, StyleSheet } from 'react-native';
 import TestModelScreen from './screens/TestModelScreen';
 import { fetchModels } from './utils/Api';
-import { io, Socket } from 'socket.io-client';
 
 const DropDown: React.FC = () => {
   const [pickerVisible, setPickerVisible] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  const socketRef = useRef<Socket | null>(null);
-  
-  const setupSocket = () => {
-    if (!socketRef.current) {
-      const socket = io('http://127.0.0.1:8000');
-      socketRef.current = socket;
-
-      socket.on('connect', () => {
-        console.log('Connected to WebSocket server');
-      });
-
-      socket.on('models', (data) => {
-        try {
-          setModels(data);
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      });
-
-      socket.on('error', (error) => {
-        console.error('WebSocket error:', error);
-        setError('WebSocket error occurred. Please try again.');
-      });
-
-      socket.on('disconnect', () => {
-        console.log('WebSocket connection closed');
-        setTimeout(setupSocket, 5000);
-      });
-    }
-  };
-
   
   const fetchInitialModelData = async () => {
     try {
@@ -59,7 +26,6 @@ const DropDown: React.FC = () => {
     }
   };
 
-
   const togglePicker = () => {
     setPickerVisible(!pickerVisible);
   };
@@ -70,16 +36,8 @@ const DropDown: React.FC = () => {
   };
 
   useEffect(() => {
-    setupSocket();
-    console.log("Not entering into socket func.")
     fetchInitialModelData();
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
   }, []);
-  
 
   return (
     <View>
