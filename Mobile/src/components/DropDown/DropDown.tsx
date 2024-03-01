@@ -13,34 +13,6 @@ const DropDown: React.FC = () => {
 
   const socketRef = useRef<Socket | null>(null);
   
-  useEffect(() => {
-    console.log("Setting up socket...");
-    setupSocket();
-    console.log("Not entering into socket func.")
-    fetchInitialModelData();
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
-    };
-  }, []);
-  
-  const fetchInitialModelData = async () => {
-    try {
-      const data = await fetchModels();
-      console.log(data);
-      setModels(data);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error fetching initial model data:', error);
-        setError(`Error fetching models: ${error.message}`);
-      } else {
-        console.error('Unknown error fetching initial model data:', error);
-        setError('Unknown error fetching models. Please try again.');
-      }
-    }
-  };
-
   const setupSocket = () => {
     if (!socketRef.current) {
       const socket = io('http://127.0.0.1:8000');
@@ -70,6 +42,24 @@ const DropDown: React.FC = () => {
     }
   };
 
+  
+  const fetchInitialModelData = async () => {
+    try {
+      const data = await fetchModels();
+      console.log(data);
+      setModels(data);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error fetching initial model data:', error);
+        setError(`Error fetching models: ${error.message}`);
+      } else {
+        console.error('Unknown error fetching initial model data:', error);
+        setError('Unknown error fetching models. Please try again.');
+      }
+    }
+  };
+
+
   const togglePicker = () => {
     setPickerVisible(!pickerVisible);
   };
@@ -78,6 +68,18 @@ const DropDown: React.FC = () => {
     setSelectedModel(model);
     togglePicker();
   };
+
+  useEffect(() => {
+    setupSocket();
+    console.log("Not entering into socket func.")
+    fetchInitialModelData();
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
+    };
+  }, []);
+  
 
   return (
     <View>
