@@ -1,5 +1,4 @@
-import * as React from 'react';
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Button, Text, StyleSheet} from 'react-native';
 import TestModelScreen from '../../screens/TestModelScreen';
 import {fetchModels} from '../../utils/Api';

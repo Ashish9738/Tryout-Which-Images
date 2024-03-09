@@ -14,6 +14,8 @@ import axios from 'axios';
 import {CheckBox} from 'react-native-elements';
 import {Picker} from '@react-native-picker/picker';
 import * as RNFS from 'react-native-fs';
+import DropDown from '../DropDown/DropDown';
+import Feedback from '../Feedback/Feedback';
 
 interface ImageData {
   name: string;
@@ -29,14 +31,6 @@ const StartTesting: React.FC = () => {
   const [base64images, setBase64Images] = useState<string[]>([]);
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] =
     useState<boolean>(false);
-
-  // Dummy data for dropdown (can be replaced with websocket data)
-  const availableModels: string[] = [
-    'Choose Model',
-    'Model 1',
-    'Model 2',
-    'Model 3',
-  ];
 
   // Function to handle image selection
   useEffect(() => {
@@ -139,14 +133,15 @@ const StartTesting: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={{padding: 20}}>
       {/* Dropdown for selecting model */}
-      <Text>Select Model to Test:</Text>
+      <DropDown />
+      {/* <Text>Select Model to Test:</Text>
       <Picker
         selectedValue={selectedModel}
         onValueChange={itemValue => setSelectedModel(itemValue)}>
         {availableModels.map((model, index) => (
           <Picker.Item key={index} label={model} value={model} />
         ))}
-      </Picker>
+      </Picker> */}
 
       {/* Choose image button */}
       <Button title="Choose Image" onPress={selectImages} />
@@ -184,32 +179,19 @@ const StartTesting: React.FC = () => {
         ))}
       </View>
 
-      {/* Scrollable section for questionnaire */}
       <ScrollView style={{marginTop: 20}}>
-        <Text style={{fontWeight: 'bold'}}>Feedback:</Text>
-        <CheckBox
-          checked={feedback[0]}
-          onPress={() => handleCheckboxChange(0)}
-          title="Question 1: Did the test result meet your expectations?"
-          containerStyle={{marginTop: 10}}
-        />
-        <CheckBox
-          checked={feedback[1]}
-          onPress={() => handleCheckboxChange(1)}
-          title="Question 2: Would you recommend this model for further testing?"
-          containerStyle={{marginTop: 10}}
-        />
+        <Feedback />
         <Button
           title="Submit Feedback"
           onPress={submitFeedback}
-          disabled={!feedback.some(value => value === true)} // Disable button if no checkbox is checked
+          disabled={!feedback.some(value => value === true)}
           color="black"
         />
-        {isFeedbackSubmitted && (
+        {/* {isFeedbackSubmitted && (
           <Text style={{color: 'green', marginTop: 10}}>
             Feedback submitted successfully!
           </Text>
-        )}
+        )} */}
       </ScrollView>
     </ScrollView>
   );

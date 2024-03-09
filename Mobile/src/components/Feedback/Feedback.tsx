@@ -87,6 +87,7 @@ const Feedback: React.FC<FeedbackProps> = () => {
                   <Text>No</Text>
                 </View>
               </RadioButton.Group>
+              
             </View>
           </View>
         ))
