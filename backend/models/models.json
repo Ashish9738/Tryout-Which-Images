@@ -1,20 +1,6 @@
 [
   {
     "id": 1,
-    "name": "Model 1",
-    "description": "Description of Model 1",
-    "price": 1000
-  },
-  {
-    "id": 2,
-    "name": "Model 2",
-    "description": "Description of Model 2",
-    "price": 1500
-  },
-  {
-    "id": 3,
-    "name": "Model 3",
-    "description": "Description of Model 3",
-    "price": 2000
+    "name": "Elephant Model"
   }
 ]

@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {useState, useEffect} from 'react';
 import {View, Button, Text, StyleSheet} from 'react-native';
-import TestModelScreen from './screens/TestModelScreen';
-import {fetchModels} from './utils/Api';
+import TestModelScreen from '../../screens/TestModelScreen';
+import {fetchModels} from '../../utils/Api';
 
 const DropDown: React.FC = () => {
   const [pickerVisible, setPickerVisible] = useState<boolean>(false);
@@ -37,7 +37,7 @@ const DropDown: React.FC = () => {
 
   useEffect(() => {
     fetchInitialModelData();
-    const fetchDataInterval = setInterval(fetchInitialModelData, 60000);
+    const fetchDataInterval = setInterval(fetchInitialModelData, 30000);
     return () => clearInterval(fetchDataInterval);
   }, []);
 

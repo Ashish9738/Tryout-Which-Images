@@ -1,9 +1,10 @@
-from ast import List
-from fastapi import Body, FastAPI
+from fastapi import FastAPI, Query, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel 
-import json
+from base64 import b64decode
+import requests
+from config import AppConfig 
 
 app = FastAPI()
 
@@ -15,40 +16,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Feedback(BaseModel):
-    question_id: str
-    feedback: str
+@app.get("/test_model")
+async def test_model(base64: str = Query(..., description="Base64-encoded image data"), model_name: str = Query(..., description="Name of the model to use")):
+   
 
-def read_model_data():
+    if not all([base64, model_name]):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing required parameters: base64 and model_name")
+
     try:
-        with open('./models/models.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print('Error reading models.json:', e)
-        return []
+        image_data = b64decode(base64)
+        data = {"image": ("image", image_data), "model_name": model_name}
+        response = requests.post(f"{AppConfig.MAS_SERVICE_URL}{AppConfig.MAS_SERVICE_ENDPOINT}", data=data)  # Using AppConfig to access attributes
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise HTTPException(status_code=response.status_code, detail=response.text)
 
-def read_questions_data():
-    try:
-        with open('./models/questions.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print('Error reading questions.json:', e)
-        return []
-
-@app.get("/models")
-async def read_models():
-    models = read_model_data()
-    return JSONResponse(content=models)
-
-@app.get("/feedback")
-async def read_questions():
-    questions = read_questions_data()
-    return JSONResponse(content=questions)
-
-@app.post("/feedback")
-async def recieving_feedback():
-    return {"message": "Question received successfully"}
-
-
+    except (ValueError, requests.exceptions.RequestException) as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error sending request to MAS service: {str(e)}")
