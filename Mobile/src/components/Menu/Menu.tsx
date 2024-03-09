@@ -39,20 +39,20 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
         }}>
         <TouchableOpacity onPress={() => navigation.navigate('AddImage')}>
           <View style={styles.iconContainer}>
-            <Icon name="id-badge" size={50} color="green" />
+            <Icon name="plus-square" size={50} color="green" />
             <Text style={{color: 'green'}}>Add Image</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate('RetrieveImageScreen')}>
           <View style={styles.iconContainer}>
-            <Icon name="suitcase" size={50} color="blue" />
+            <Icon name="caret-square-o-up" size={50} color="blue" />
             <Text style={{color: 'blue'}}>Retrieve Image</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('StartTesting')}>
           <View style={styles.iconContainer}>
-            <Icon name="search" size={50} color="orange" />
+            <Icon name="pencil-square" size={50} color="orange" />
             <Text style={{color: 'orange'}}>Start Testing</Text>
           </View>
         </TouchableOpacity>

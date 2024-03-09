@@ -2,8 +2,7 @@ from typing import List, Optional
 from fastapi import FastAPI, File, Form, HTTPException,Query, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from service.service import read_categories, read_model_data, read_questions_data, saveFeedback, test_model_v1, test_model_v2
-from database.database import storeFeedback
+from service.service import Feedback, Metadata, create_Feedback, create_Metadata, read_categories, read_model_data, read_questions_data, test_model_v1, test_model_v2
 from ciaos import save,get
 from config import AppConfig
 
@@ -46,22 +45,24 @@ async def read_models():
     models = read_model_data()
     return JSONResponse(content=models)
 
+
+# As if now we are not using this...
 @app.get("/feedback")
 async def read_questions():
     questions = read_questions_data()
     return JSONResponse(content=questions)
 
-@app.post("/feedback")
-async def recieving_feedback(base64: str = Query(..., description="Base64-encoded image data")):
-    imageKey = saveFeedback(base64)
-    if imageKey:
-        storeFeedback(imageKey) 
-        return {"message": "Question received successfully"}
-    else:
-        return {"error": "Failed to save feedback"}
-
+# As if now we are not using this...
 @app.get("/categories")
 async def display_category():
     categories = read_categories()
     return JSONResponse(content=categories)
 
+
+@app.post("/metaFeedback")
+async def create_metadata(metadata: Metadata):
+    return create_Metadata(metadata)
+
+@app.post("/feedback")
+async def create_feedback(feedback: Feedback):
+    return create_Feedback(feedback)

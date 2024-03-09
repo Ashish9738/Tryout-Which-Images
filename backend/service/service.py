@@ -1,22 +1,25 @@
 import base64
 import json
+from typing import List
 from fastapi import HTTPException, UploadFile
 from pydantic import BaseModel
 import requests
 from config import AppConfig
-from ciaos import save
+from database.database import collectionMeta,collectionResult
+
+class QuestionAnswer(BaseModel):
+    questionID:str
+    answer : str
+
+class Metadata(BaseModel):
+    type: str
+    value: str
 
 class Feedback(BaseModel):
-    question_id: str
-    feedback: str
+    modelName : str
+    imageKey : str
+    qa : List[QuestionAnswer]
 
-def saveFeedback(base64_data: str):
-    try:
-        imageKey = save(AppConfig.STORAGE_BASE_URL, None, base64_data)
-        return imageKey
-    except Exception as e:
-        print(f"Error saving feedback: {e}")
-        return None
 
 def read_model_data():
     try:
@@ -77,3 +80,20 @@ def test_model_v2(file: UploadFile):
         
     except Exception as e:
         return {"error": f"Failed to complete the request: {str(e)}"}
+    
+def create_Metadata(metadata: Metadata):
+    try:
+        metadata_dict = metadata.dict()
+        inserted_metadata = collectionMeta.insert_one(metadata_dict)
+        return {"message": "Metadata created successfully", "metadata_id": str(inserted_metadata.inserted_id)}
+        
+    except Exception as e:
+        return {"error": f"Failed to send metaFeedback the request: {str(e)}"}
+
+def create_Feedback(feedback: Feedback):
+    try:
+        feedback_id = collectionResult.insert_one(feedback.dict()).inserted_id
+        return {"message": "Feedback submitted successfully", "feedback_id": str(feedback_id)}
+    except Exception as e:
+        return {"error": f"Failed to send feedback the request: {str(e)}"}
+

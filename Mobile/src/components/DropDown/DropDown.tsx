@@ -8,12 +8,14 @@ const DropDown: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [initialDataFetched, setInitialDataFetched] = useState<boolean>(false);
 
   const fetchInitialModelData = async () => {
     try {
       const data = await fetchModels();
       console.log(data);
       setModels(data);
+      setInitialDataFetched(true); // Update the state indicating initial data fetched
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error fetching initial model data:', error);
@@ -35,10 +37,10 @@ const DropDown: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchInitialModelData();
-    const fetchDataInterval = setInterval(fetchInitialModelData, 30000);
-    return () => clearInterval(fetchDataInterval);
-  }, []);
+    if (!initialDataFetched) {
+      fetchInitialModelData();
+    }
+  }, [initialDataFetched]);
 
   return (
     <View>
@@ -65,10 +67,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginTop: 10,
+    marginBottom: 15,
     color: 'black',
   },
   buttonContainer: {
-    marginLeft: 10,
+    height: 40,
+    width: 370,
     marginRight: 10,
   },
   error: {
