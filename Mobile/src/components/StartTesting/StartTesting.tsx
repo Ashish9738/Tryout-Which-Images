@@ -9,6 +9,7 @@ import {
   PermissionsAndroid,
   ScrollView,
   StyleSheet,
+  ActivityIndicator, // Import ActivityIndicator for loading indicator
 } from 'react-native';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
@@ -24,10 +25,12 @@ const StartTesting: React.FC = () => {
   const [feedback, setFeedback] = useState<boolean[]>([false, false]);
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
   const [base64images, setBase64Images] = useState<string[]>([]);
+  const [metadataResults, setMetadataResults] = useState(null);
   const [isFeedbackSubmitted, setIsFeedbackSubmitted] =
     useState<boolean>(false);
   const [question1Answer, setQuestion1Answer] = useState<string>('');
   const [question2Answer, setQuestion2Answer] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading indicator
 
   useEffect(() => {
     requestPermissions();
@@ -65,38 +68,8 @@ const StartTesting: React.FC = () => {
         cropping: true,
       });
       setSelectedImages(images);
-
-      const base64ImagesArray = await Promise.all(
-        images.map(async image => {
-          const filePath =
-            Platform.OS === 'android'
-              ? image.path.replace('file://', '')
-              : image.path;
-          return await RNFS.readFile(filePath, 'base64');
-        }),
-      );
-      setBase64Images(base64ImagesArray);
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      if (!selectedImages) {
-        Alert.alert('Error', 'Please select an image before submitting.');
-        return;
-      }
-
-      const response = await axios.post(`${api}/metaFeedback`, {
-        type: 'type',
-        value: 'value',
-      });
-
-      setApiResults(response.data);
-    } catch (error) {
-      console.error('Error submitting test:', error);
-      Alert.alert('Error', 'Failed to submit test. Please try again.');
     }
   };
 
@@ -122,6 +95,76 @@ const StartTesting: React.FC = () => {
       console.error('Error submitting feedback:', error);
       Alert.alert('Error', 'Failed to submit feedback. Please try again.');
     }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      if (!selectedImages || selectedImages.length === 0) {
+        Alert.alert('Error', 'Please select an image before submitting.');
+        return;
+      }
+
+      setIsLoading(true); // Show loading indicator
+
+      const formData = new FormData();
+      const image = selectedImages[0];
+
+      formData.append('file', {
+        uri: image.path,
+        type: image.mime,
+        name: image.filename || 'image.jpg',
+      });
+
+      const fileResponse = await axios.post(`${api}/test_model_v2`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      setApiResults(fileResponse.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error submitting test:', error);
+      Alert.alert('Error', 'Failed to submit test. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const renderResultsComponent = () => {
+    if (apiResults instanceof Promise) {
+      return <ActivityIndicator size="large" color="black" />;
+    }
+
+    if (apiResults && apiResults.error) {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.error}>Error: {apiResults.error}</Text>
+        </View>
+      );
+    }
+
+    if (
+      Object.keys(apiResults).length === 0 &&
+      apiResults.constructor === Object
+    ) {
+      return null;
+    }
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.header}>API Results</Text>
+        <View style={styles.table}>
+          <View style={styles.row}>
+            <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
+            <Text style={[styles.cell, styles.headerCell]}>Value</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.cell}>isElephant</Text>
+            <Text style={styles.cell}>{apiResults}</Text>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -157,38 +200,11 @@ const StartTesting: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <View style={{marginTop: 20}}>
-        <Text style={{fontWeight: 'bold', marginBottom: 10}}>API Results:</Text>
-        <ScrollView horizontal>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginBottom: 10,
-              display: 'flex',
-            }}>
-            <View style={{flex: 1, marginRight: 5}}>
-              <Text style={{fontWeight: 'bold', marginBottom: 5}}>
-                Parameter
-              </Text>
-              {Object.entries(apiResults).map(([key, value], index) => (
-                <Text key={index} style={{marginBottom: 5}}>
-                  {key}
-                </Text>
-              ))}
-            </View>
-            <View style={{flex: 1, marginLeft: 5}}>
-              <Text style={{fontWeight: 'bold', marginBottom: 5}}>Value</Text>
-              {Object.entries(apiResults).map(([key, value], index) => (
-                <Text key={index} style={{marginBottom: 5}}>
-                  {typeof value === 'object'
-                    ? JSON.stringify(value)
-                    : String(value)}
-                </Text>
-              ))}
-            </View>
-          </View>
-        </ScrollView>
-      </View>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="black" />
+      ) : (
+        renderResultsComponent()
+      )}
 
       <ScrollView style={{marginTop: 20}}>
         <Text style={{fontWeight: 'bold'}}>Feedback:</Text>
@@ -250,5 +266,43 @@ const styles = StyleSheet.create({
     width: '100%',
     margin: 0,
   },
+  container: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  header: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 18,
+  },
+  table: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    overflow: 'hidden',
+    minWidth: '100%',
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  cell: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    textAlign: 'center',
+    borderRightWidth: 1,
+    borderColor: '#ccc',
+  },
+  headerCell: {
+    backgroundColor: '#f0f0f0',
+    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 10,
+  },
 });
+
 export default StartTesting;

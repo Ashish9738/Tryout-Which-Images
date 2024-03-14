@@ -32,7 +32,6 @@ const AddImage: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Request camera and storage permissions when the component mounts
     requestPermissions();
   }, []);
 

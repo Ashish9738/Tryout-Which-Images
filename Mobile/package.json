@@ -28,6 +28,7 @@
     "react-native-safe-area-context": "^4.9.0",
     "react-native-screens": "^3.29.0",
     "react-native-vector-icons": "^10.0.3",
+    "rn-fetch-blob": "^0.12.0",
     "socket.io": "^4.7.4",
     "socket.io-client": "^4.7.4"
   },
