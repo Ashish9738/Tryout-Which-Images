@@ -3,7 +3,11 @@ import {View, Button, Text, StyleSheet} from 'react-native';
 import TestModelScreen from '../../screens/TestModelScreen';
 import {fetchModels} from '../../utils/Api';
 
-const DropDown: React.FC = () => {
+interface Props {
+  onSelect: (model: any) => void;
+}
+
+const DropDown: React.FC<Props> = ({onSelect}) => {
   const [pickerVisible, setPickerVisible] = useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<any>(null);
   const [models, setModels] = useState<any[]>([]);
@@ -32,8 +36,9 @@ const DropDown: React.FC = () => {
   };
 
   const handleSelectModel = (model: any) => {
-    setSelectedModel(model);
-    togglePicker();
+    setSelectedModel(model); // Update the selected model state
+    onSelect(model); // Pass the selected model to the parent component
+    togglePicker(); // Close the picker
   };
 
   useEffect(() => {

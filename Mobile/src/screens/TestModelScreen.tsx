@@ -1,25 +1,28 @@
 import * as React from 'react';
-import { Text, View } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {Text, View} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
 
 interface Props {
   onSelect: (model: any) => void;
   models: any[];
 }
 
-const TestModelScreen: React.FC<Props> = ({ onSelect, models }) => {
+const TestModelScreen: React.FC<Props> = ({onSelect, models}) => {
   if (!models || models.length === 0) {
-    return <View><Text>No models available</Text></View>;
+    return (
+      <View>
+        <Text>No models available</Text>
+      </View>
+    );
   }
 
   return (
     <View>
       <Picker
         selectedValue={null}
-        onValueChange={(itemValue: any) => onSelect(itemValue)}
-      >
+        onValueChange={(itemValue: any) => onSelect(itemValue)}>
         <Picker.Item label="Select the Model" value={null} />
-        {models.map((model) => (
+        {models.map(model => (
           <Picker.Item key={model.id} label={model.name} value={model} />
         ))}
       </Picker>

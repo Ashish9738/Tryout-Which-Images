@@ -18,6 +18,7 @@ import * as RNFS from 'react-native-fs';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import DropDown from '../DropDown/DropDown';
 import {api} from '../../utils/Api';
+import Feedback from '../Feedback/Feedback';
 
 const StartTesting: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>('Choose Model');
@@ -31,6 +32,7 @@ const StartTesting: React.FC = () => {
   const [question1Answer, setQuestion1Answer] = useState<string>('');
   const [question2Answer, setQuestion2Answer] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading indicator
+  const [apiResultsLoaded, setApiResultsLoaded] = useState<boolean>(false); // State to track if API results are loaded
 
   useEffect(() => {
     requestPermissions();
@@ -99,6 +101,11 @@ const StartTesting: React.FC = () => {
 
   const handleSubmit = async () => {
     try {
+      if (selectedModel === 'Choose Model') {
+        Alert.alert('Error', 'Please select a model before submitting.');
+        return;
+      }
+
       if (!selectedImages || selectedImages.length === 0) {
         Alert.alert('Error', 'Please select an image before submitting.');
         return;
@@ -123,6 +130,7 @@ const StartTesting: React.FC = () => {
 
       setApiResults(fileResponse.data);
       setIsLoading(false);
+      setApiResultsLoaded(true);
     } catch (error) {
       console.error('Error submitting test:', error);
       Alert.alert('Error', 'Failed to submit test. Please try again.');
@@ -169,9 +177,8 @@ const StartTesting: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={{padding: 20}}>
-      <DropDown />
+      <DropDown onSelect={model => setSelectedModel(model)} />
       <Button title="Choose Image" onPress={selectImages} />
-
       <View style={styles.photo}>
         {selectedImages.map((image, index) => (
           <View key={index}>
@@ -206,52 +213,7 @@ const StartTesting: React.FC = () => {
         renderResultsComponent()
       )}
 
-      <ScrollView style={{marginTop: 20}}>
-        <Text style={{fontWeight: 'bold'}}>Feedback:</Text>
-        <View>
-          <Text>Question 1: Did the test result meet your expectations?</Text>
-          <RadioButton.Group
-            onValueChange={newValue => setQuestion1Answer(newValue)}
-            value={question1Answer}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <RadioButton.Android value="Yes" />
-              <Text>Yes</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <RadioButton.Android value="No" />
-              <Text>No</Text>
-            </View>
-          </RadioButton.Group>
-        </View>
-        <View style={{marginTop: 10}}>
-          <Text>
-            Question 2: Would you recommend this model for further testing?
-          </Text>
-          <RadioButton.Group
-            onValueChange={newValue => setQuestion2Answer(newValue)}
-            value={question2Answer}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <RadioButton.Android value="Yes" />
-              <Text>Yes</Text>
-            </View>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              <RadioButton.Android value="No" />
-              <Text>No</Text>
-            </View>
-          </RadioButton.Group>
-        </View>
-        <Button
-          title="Submit Feedback"
-          onPress={submitFeedback}
-          disabled={!question1Answer || !question2Answer}
-          color="black"
-        />
-        {isFeedbackSubmitted && (
-          <Text style={{color: 'green', marginTop: 10}}>
-            Feedback submitted successfully!
-          </Text>
-        )}
-      </ScrollView>
+      {apiResultsLoaded && <Feedback />}
     </ScrollView>
   );
 };
