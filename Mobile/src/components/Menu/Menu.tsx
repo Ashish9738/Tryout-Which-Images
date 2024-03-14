@@ -8,24 +8,25 @@ interface MenuProps {
 
 const Menu: React.FC<MenuProps> = ({navigation}) => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text
         style={{
           fontWeight: 'bold',
-          fontSize: 48,
-          color: 'black',
+          fontSize: 40,
+          fontFamily: 'Roboto',
+          color: '#000000',
           textAlign: 'center',
           padding: 20,
           marginTop: 20,
           marginBottom: 50,
         }}>
-        WhichImages
+        Which Images
       </Text>
       <Text
         style={{
           fontWeight: 'bold',
           fontSize: 32,
-          color: 'black',
+          color: '#000000',
           textAlign: 'center',
           marginBottom: 50,
         }}>
@@ -62,12 +63,17 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#586f7c',
+  },
   iconContainer: {
+    backgroundColor: '#000000',
     alignItems: 'center',
-    borderColor: 'gray',
+    borderColor: '#0d1b2a',
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 10,
+    padding: 15,
     marginBottom: 20,
   },
 });

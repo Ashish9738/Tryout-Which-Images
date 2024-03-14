@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Text, View} from 'react-native';
+import {Text, View, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
 interface Props {
@@ -17,10 +17,11 @@ const TestModelScreen: React.FC<Props> = ({onSelect, models}) => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <Picker
         selectedValue={null}
-        onValueChange={(itemValue: any) => onSelect(itemValue)}>
+        onValueChange={(itemValue: any) => onSelect(itemValue)}
+        style={styles.picker}>
         <Picker.Item label="Select the Model" value={null} />
         {models.map(model => (
           <Picker.Item key={model.id} label={model.name} value={model} />
@@ -29,5 +30,21 @@ const TestModelScreen: React.FC<Props> = ({onSelect, models}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    borderWidth: 1,
+    borderColor: 'gray',
+    marginBottom: 10,
+    paddingBottom: 8,
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+    color: 'black',
+    fontSize: 20,
+    fontWeight: '900',
+  },
+});
 
 export default TestModelScreen;

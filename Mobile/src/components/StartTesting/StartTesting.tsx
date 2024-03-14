@@ -176,9 +176,11 @@ const StartTesting: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={{padding: 20}}>
+    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
       <DropDown onSelect={model => setSelectedModel(model)} />
-      <Button title="Choose Image" onPress={selectImages} />
+      <TouchableOpacity onPress={selectImages} style={styles.customButton}>
+        <Text style={styles.customButtonText}>Choose Image</Text>
+      </TouchableOpacity>
       <View style={styles.photo}>
         {selectedImages.map((image, index) => (
           <View key={index}>
@@ -190,21 +192,8 @@ const StartTesting: React.FC = () => {
         ))}
       </View>
 
-      <TouchableOpacity onPress={handleSubmit}>
-        <Text
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            paddingTop: 5,
-            height: 35,
-            backgroundColor: 'black',
-            color: 'white',
-            textAlign: 'center',
-            fontSize: 17,
-          }}>
-          SUBMIT TEST
-        </Text>
+      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+        <Text style={styles.submitButtonText}>SUBMIT TEST</Text>
       </TouchableOpacity>
 
       {isLoading ? (
@@ -219,8 +208,12 @@ const StartTesting: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  scrollViewContainer: {
+    flexGrow: 1,
+    backgroundColor: '#586f7c',
+    padding: 20,
+  },
   photo: {
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'center',
@@ -256,7 +249,8 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   headerCell: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#000000',
+    color: 'white',
     fontWeight: 'bold',
   },
   error: {
@@ -264,6 +258,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 10,
+  },
+  submitButton: {
+    backgroundColor: 'black',
+    paddingVertical: 11,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+    marginBottom: 20,
+    marginTop: 15,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 17,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  customButton: {
+    backgroundColor: 'gray',
+    paddingVertical: 11,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+    marginBottom: 15,
+  },
+  customButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

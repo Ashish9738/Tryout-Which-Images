@@ -15,20 +15,20 @@ import {
 } from 'react-native';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
-import ModalSelector from 'react-native-modal-selector';
 import * as RNFS from 'react-native-fs';
 
 const AddImage: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [base64images, setBase64Images] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
 
   const category: {key: string; label: string}[] = [
-    {key: 'cat1', label: 'cat1'},
-    {key: 'cat2', label: 'cat2'},
-    {key: 'cat3', label: 'cat3'},
+    {key: 'cat1', label: 'Category1'},
+    {key: 'cat2', label: 'Category2'},
+    {key: 'cat3', label: 'Category3'},
   ];
 
   useEffect(() => {
@@ -60,6 +60,11 @@ const AddImage: React.FC = () => {
     }
   };
 
+  const selectCategory = (categoryKey: string) => {
+    setSelectedCategory(categoryKey);
+    setShowDropdown(false);
+  };
+
   const selectImages = async () => {
     try {
       const images = await ImagePicker.openPicker({
@@ -83,22 +88,18 @@ const AddImage: React.FC = () => {
     }
   };
 
-  const selectCategory = (option: {key: string; label: string}) => {
-    setSelectedCategory(option.key);
-    if (selectedImages.length > 0) {
-      uploadImages();
-    }
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-
   const uploadImages = async () => {
-    if (!selectedCategory || selectedImages.length === 0) {
-      Alert.alert('Error', 'Please select at least one image and a category.');
+    if (!selectedCategory) {
+      Alert.alert('Error', 'Please select a category before uploading images.');
       return;
     }
 
-    await setIsLoading(true);
+    if (selectedImages.length === 0) {
+      Alert.alert('Error', 'Please select at least one image to upload.');
+      return;
+    }
+
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -127,14 +128,37 @@ const AddImage: React.FC = () => {
       Alert.alert('Error', 'Failed to upload images. Please try again.');
     }
 
-    await setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (
-    <ScrollView>
-      <View style={[{width: windowWidth}]}>
+    <ScrollView style={styles.container}>
+      <View>
         <Text style={styles.heading}>Add Images</Text>
-        <Button onPress={selectImages} title="Select Images" color="black" />
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => setShowDropdown(!showDropdown)}>
+          <Text style={styles.dropdownButtonText}>
+            {selectedCategory ? selectedCategory : 'Select Category'}
+          </Text>
+        </TouchableOpacity>
+
+        {showDropdown && (
+          <View style={styles.dropdownContainer}>
+            {category.map(item => (
+              <TouchableOpacity
+                key={item.label}
+                style={styles.dropdownItem}
+                onPress={() => selectCategory(item.label)}>
+                <Text>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <TouchableOpacity onPress={selectImages}>
+          <Text style={styles.loadingContainer}>Select Images</Text>
+        </TouchableOpacity>
 
         <View style={styles.parent}>
           {selectedImages.map((image, index) => (
@@ -142,23 +166,14 @@ const AddImage: React.FC = () => {
               <Image
                 style={[styles.child, {width: windowWidth / 3.2}]}
                 source={{uri: image.path}}
+                key={index.toString()}
               />
             </View>
           ))}
         </View>
 
-        <ModalSelector
-          data={category}
-          initValueTextStyle={{fontWeight: 'bold', color: 'black'}}
-          initValue="Select Category"
-          accessible={true}
-          onChange={selectCategory}
-          selectStyle={{borderWidth: 10}}
-          cancelStyle={{borderWidth: 10}}
-        />
-
         <TouchableOpacity onPress={uploadImages}>
-          <Text style={styles.loadingContainer}>Upload Images</Text>
+          <Text style={styles.uploadImage}>Upload Images</Text>
           {isLoading && (
             <View>
               <ActivityIndicator size="large" color="#0000ff" />
@@ -171,14 +186,21 @@ const AddImage: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flex: 1,
+    backgroundColor: '#586f7c',
+    padding: 20,
+  },
   loadingContainer: {
-    backgroundColor: 'blue',
+    backgroundColor: '#000000',
     color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     margin: 10,
     padding: 10,
+    borderRadius: 5,
   },
   parent: {
     flex: 1,
@@ -194,13 +216,51 @@ const styles = StyleSheet.create({
   heading: {
     color: 'black',
     fontWeight: 'bold',
-    width: '100%',
-    margin: 10,
-    marginLeft: 70,
     fontSize: 50,
-    flex: 1,
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  dropdownButton: {
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: 'lightgray',
+    padding: 15,
+    marginTop: 10,
+    borderRadius: 5,
+  },
+  dropdownButtonText: {
+    color: 'black',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  dropdownContainer: {
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: 'lightgray',
+    padding: 10,
+    marginTop: 5,
+    borderRadius: 5,
+  },
+  dropdownItem: {
+    color: 'black',
+    fontWeight: '900',
+    backgroundColor: 'lighrgray',
+    padding: 10,
+    marginTop: 3,
+    borderRadius: 5,
     alignItems: 'center',
-    justifyContent: 'center',
+  },
+  uploadImage: {
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    margin: 10,
+    padding: 10,
+    borderRadius: 5,
   },
 });
 

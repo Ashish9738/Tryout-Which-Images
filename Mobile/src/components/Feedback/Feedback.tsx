@@ -93,7 +93,11 @@ const Feedback: React.FC<FeedbackProps> = () => {
       ) : (
         <Text>No questions available</Text>
       )}
-      <Button title="Submit Feedback" onPress={submitFeedback} />
+      <Button
+        title="Submit Feedback"
+        onPress={submitFeedback}
+        color="#000000"
+      />
     </View>
   );
 };

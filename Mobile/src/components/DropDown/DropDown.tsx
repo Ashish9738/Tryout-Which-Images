@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, Button, Text, StyleSheet} from 'react-native';
+import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import TestModelScreen from '../../screens/TestModelScreen';
 import {fetchModels} from '../../utils/Api';
 
@@ -49,9 +49,9 @@ const DropDown: React.FC<Props> = ({onSelect}) => {
 
   return (
     <View>
-      <View style={styles.buttonContainer}>
-        <Button title="Select Model" onPress={togglePicker} />
-      </View>
+      <TouchableOpacity style={styles.buttonContainer} onPress={togglePicker}>
+        <Text style={styles.buttonText}>Select Model</Text>
+      </TouchableOpacity>
       {pickerVisible && (
         <TestModelScreen onSelect={handleSelectModel} models={models} />
       )}
@@ -73,12 +73,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 15,
-    color: 'black',
+    color: '#000000',
   },
   buttonContainer: {
-    height: 40,
+    height: 50,
     width: 370,
-    marginRight: 10,
+    marginBottom: 10,
+    backgroundColor: '#2f4550',
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '400',
   },
   error: {
     fontSize: 16,
