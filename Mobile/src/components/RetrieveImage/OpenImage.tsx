@@ -3,7 +3,6 @@ import React from 'react';
 
 const OpenImage = ({route}: any) => {
   const {photoUri} = route.params;
-  // console.log(String(photoUri));
 
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>

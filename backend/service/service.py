@@ -5,7 +5,7 @@ from fastapi import HTTPException, UploadFile
 from pydantic import BaseModel
 import requests
 from config import AppConfig
-from database.database import collectionMeta,collectionResult
+from database.database import collectionMeta, collectionResult, collectionCategory, collectionQuestion, collectionImageID
 
 class QuestionAnswer(BaseModel):
     questionID:str
@@ -19,6 +19,9 @@ class Feedback(BaseModel):
     modelName : str
     imageKey : str
     qa : List[QuestionAnswer]
+
+class Query(BaseModel):
+    query : str
 
 
 def read_model_data():
@@ -81,19 +84,46 @@ def test_model_v2(file: UploadFile):
     except Exception as e:
         return {"error": f"Failed to complete the request: {str(e)}"}
     
-def create_Metadata(metadata: Metadata):
+def createFeedback(feedback: Feedback):
+    try:
+        feedback_id = collectionResult.insert_one(feedback.dict()).inserted_id
+        return {"message": "Feedback submitted successfully", "feedback_id": str(feedback_id)}
+
+    except Exception as e:
+        return {"error": f"Failed to send feedback the request: {str(e)}"}
+
+def create_metadata(metadata: Metadata):
     try:
         metadata_dict = metadata.dict()
-        inserted_metadata = collectionMeta.insert_one(metadata_dict)
+        inserted_metadata = collectionImageID.insert_one(metadata_dict)
         return {"message": "Metadata created successfully", "metadata_id": str(inserted_metadata.inserted_id)}
         
     except Exception as e:
         return {"error": f"Failed to send metaFeedback the request: {str(e)}"}
 
-def create_Feedback(feedback: Feedback):
+def read_model_data():
     try:
-        feedback_id = collectionResult.insert_one(feedback.dict()).inserted_id
-        return {"message": "Feedback submitted successfully", "feedback_id": str(feedback_id)}
+        data = []
+        for document in collectionMeta.find():
+            data.append(document["value"])
+        return data
     except Exception as e:
-        return {"error": f"Failed to send feedback the request: {str(e)}"}
+         return {"error": f"Failed to fetch category: {str(e)}"}
 
+def read_category():
+    try:
+        data = []
+        for document in collectionCategory.find():
+            data.append(document["category"])
+        return data
+    except Exception as e:
+         return {"error": f"Failed to fetch category: {str(e)}"}
+
+def read_question():
+    try:
+        data = []
+        for document in collectionQuestion.find():
+            data.append(document["q"])
+        return data
+    except Exception as e:
+         return {"error": f"Failed to fetch category: {str(e)}"}

@@ -3,11 +3,12 @@ export const fetchModelDetails = 'https://cia-mas.cialabs.tech/';
 
 export const fetchModels = async (): Promise<any[]> => {
   try {
-    const response = await fetch(`${api}/models`);
+    const response = await fetch(`${api}/select_option?query=model`);
     if (!response.ok) {
-      throw new Error('Failed to fetch models');
+      throw new Error('Failed to fetch odels');
     }
     const data = await response.json();
+    console.log(data);
     return data;
   } catch (error: any) {
     if (error instanceof Error) {

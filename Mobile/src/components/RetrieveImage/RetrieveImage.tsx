@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
+import {api} from '../../utils/Api'; 
 
 interface ImageData {
   name: string;
@@ -23,17 +24,26 @@ const RetrieveImage: React.FC = () => {
   const [images, setImages] = useState<ImageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [options, setOptions] = useState<string[]>([]);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const navigation = useNavigation();
-  const categories: {key: string; label: string}[] = [
-    {key: 'cat1', label: 'Category1'},
-    {key: 'cat2', label: 'Category2'},
-    {key: 'cat3', label: 'Category3'},
-  ];
 
-  const selectCategory = (categoryKey: string) => {
-    setSelectedCategory(categoryKey);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${api}/select_option?query=category`);
+      setOptions(response.data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const selectCategory = (category: string) => {
+    setSelectedCategory(category);
     setShowDropdown(false);
   };
 
@@ -62,7 +72,7 @@ const RetrieveImage: React.FC = () => {
 
       if (!Array.isArray(response.data)) {
         Alert.alert('Error', 'Invalid image data received from the server.');
-        setIsLoading(false); // Stop loading indicator
+        setIsLoading(false);
         return;
       }
 
@@ -99,12 +109,12 @@ const RetrieveImage: React.FC = () => {
           </TouchableOpacity>
           {showDropdown && (
             <View style={styles.dropdown}>
-              {categories.map(item => (
+              {options.map((item, index) => (
                 <TouchableOpacity
-                  key={item.key}
+                  key={index}
                   style={styles.dropdownItem}
-                  onPress={() => selectCategory(item.label)}>
-                  <Text>{item.label}</Text>
+                  onPress={() => selectCategory(item)}>
+                  <Text>{item}</Text>
                 </TouchableOpacity>
               ))}
             </View>

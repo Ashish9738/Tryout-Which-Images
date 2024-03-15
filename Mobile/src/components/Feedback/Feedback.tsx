@@ -1,11 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Button} from 'react-native';
+import {Text, View, Button, Alert} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {api} from '../../utils/Api';
 
-interface FeedbackProps {}
+interface FeedbackProps {
+  model: string;
+  setModel: React.Dispatch<React.SetStateAction<string>>;
+}
 
-const Feedback: React.FC<FeedbackProps> = () => {
+const Feedback: React.FC<FeedbackProps> = ({model}) => {
   const [questions, setQuestions] = useState<string[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
@@ -17,13 +20,13 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`${api}/feedback`);
+      const response = await fetch(`${api}/select_option?query=question`);
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
       const data = await response.json();
-      if (data && Array.isArray(data.questions)) {
-        setQuestions(data.questions);
+      if (Array.isArray(data)) {
+        setQuestions(data);
       } else {
         throw new Error('Invalid data format received');
       }
@@ -41,18 +44,37 @@ const Feedback: React.FC<FeedbackProps> = () => {
 
   const submitFeedback = async () => {
     try {
+      if (Object.keys(selectedOptions).length !== 2) {
+        Alert.alert('Error', 'Please answer both questions before submitting.');
+        return;
+      }
+
       const response = await fetch(`${api}/feedback`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(selectedOptions),
+        body: JSON.stringify({
+          modelName: model,
+          imageKey: '',
+          qa: [
+            {
+              questionID: questions[0],
+              answer: selectedOptions[0],
+            },
+            {
+              questionID: questions[1],
+              answer: selectedOptions[1],
+            },
+          ],
+        }),
       });
       if (!response.ok) {
         throw new Error('Failed to submit feedback');
       }
       console.log('Feedback sent to server:', selectedOptions);
       setSelectedOptions({});
+      Alert.alert('Success', 'Feedback submitted successfully');
     } catch (error) {
       console.error('Error submitting feedback:', error);
     }

@@ -9,7 +9,7 @@ import {
   PermissionsAndroid,
   ScrollView,
   StyleSheet,
-  ActivityIndicator, // Import ActivityIndicator for loading indicator
+  ActivityIndicator,
 } from 'react-native';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
@@ -31,8 +31,8 @@ const StartTesting: React.FC = () => {
     useState<boolean>(false);
   const [question1Answer, setQuestion1Answer] = useState<string>('');
   const [question2Answer, setQuestion2Answer] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false); // State for loading indicator
-  const [apiResultsLoaded, setApiResultsLoaded] = useState<boolean>(false); // State to track if API results are loaded
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [apiResultsLoaded, setApiResultsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     requestPermissions();
@@ -75,30 +75,6 @@ const StartTesting: React.FC = () => {
     }
   };
 
-  const submitFeedback = async () => {
-    try {
-      await axios.post(`${api}/feedback`, {
-        modelName: 'Elephant Model',
-        imageKey: `${apiResults.metadata_id}`,
-        qa: [
-          {
-            questionID: '1',
-            answer: `${question1Answer}`,
-          },
-          {
-            questionID: '2',
-            answer: `${question2Answer}`,
-          },
-        ],
-      });
-      setIsFeedbackSubmitted(true);
-      console.log('feedback added succesfully');
-    } catch (error) {
-      console.error('Error submitting feedback:', error);
-      Alert.alert('Error', 'Failed to submit feedback. Please try again.');
-    }
-  };
-
   const handleSubmit = async () => {
     try {
       if (selectedModel === 'Choose Model') {
@@ -111,7 +87,7 @@ const StartTesting: React.FC = () => {
         return;
       }
 
-      setIsLoading(true); // Show loading indicator
+      setIsLoading(true);
 
       const formData = new FormData();
       const image = selectedImages[0];
@@ -121,6 +97,8 @@ const StartTesting: React.FC = () => {
         type: image.mime,
         name: image.filename || 'image.jpg',
       });
+
+      // TO_DO : ADD FETCH METADATA FOR THE IMAGE
 
       const fileResponse = await axios.post(`${api}/test_model_v2`, formData, {
         headers: {
@@ -202,7 +180,9 @@ const StartTesting: React.FC = () => {
         renderResultsComponent()
       )}
 
-      {apiResultsLoaded && <Feedback />}
+      {apiResultsLoaded && (
+        <Feedback model={selectedModel} setModel={setSelectedModel} />
+      )}
     </ScrollView>
   );
 };

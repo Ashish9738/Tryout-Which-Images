@@ -19,7 +19,7 @@ const DropDown: React.FC<Props> = ({onSelect}) => {
       const data = await fetchModels();
       console.log(data);
       setModels(data);
-      setInitialDataFetched(true); // Update the state indicating initial data fetched
+      setInitialDataFetched(true);
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error fetching initial model data:', error);
@@ -36,9 +36,9 @@ const DropDown: React.FC<Props> = ({onSelect}) => {
   };
 
   const handleSelectModel = (model: any) => {
-    setSelectedModel(model); // Update the selected model state
-    onSelect(model); // Pass the selected model to the parent component
-    togglePicker(); // Close the picker
+    setSelectedModel(model);
+    onSelect(model);
+    togglePicker();
   };
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const DropDown: React.FC<Props> = ({onSelect}) => {
 
       {/* To display the Model which is been selected */}
       <Text style={styles.selectedModel}>
-        Selected Model: {selectedModel ? selectedModel.name : 'None'}
+        Selected Model: {selectedModel ? selectedModel : 'None'}
       </Text>
 
       {/* Display error message if there's an error */}

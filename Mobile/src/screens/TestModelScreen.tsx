@@ -24,7 +24,7 @@ const TestModelScreen: React.FC<Props> = ({onSelect, models}) => {
         style={styles.picker}>
         <Picker.Item label="Select the Model" value={null} />
         {models.map(model => (
-          <Picker.Item key={model.id} label={model.name} value={model} />
+          <Picker.Item key={model} label={model} value={model} />
         ))}
       </Picker>
     </View>

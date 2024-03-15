@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {
-  Button,
   View,
   Text,
   Image,
@@ -16,6 +15,7 @@ import {
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
+import {api} from '../../utils/Api';
 
 const AddImage: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
@@ -23,16 +23,12 @@ const AddImage: React.FC = () => {
   const [base64images, setBase64Images] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [options, setOptions] = useState<string[]>([]);
   const windowWidth = Dimensions.get('window').width;
-
-  const category: {key: string; label: string}[] = [
-    {key: 'cat1', label: 'Category1'},
-    {key: 'cat2', label: 'Category2'},
-    {key: 'cat3', label: 'Category3'},
-  ];
 
   useEffect(() => {
     requestPermissions();
+    fetchCategories();
   }, []);
 
   const requestPermissions = async () => {
@@ -57,6 +53,17 @@ const AddImage: React.FC = () => {
       } catch (err) {
         console.warn(err);
       }
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${api}/select_option?query=category`);
+      const responseData = await response.json();
+      setOptions(responseData);
+      console.log('Fetched categories:', responseData);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -105,12 +112,10 @@ const AddImage: React.FC = () => {
       const formData = new FormData();
       formData.append('category', selectedCategory);
 
-      // Append each base64 image to FormData
       base64images.forEach((base64Image, index) => {
         formData.append('image', base64Image);
       });
 
-      // Send POST request with FormData
       const response = await axios.post(
         'https://which-api.cialabs.tech/uploadfiles/',
         formData,
@@ -145,12 +150,12 @@ const AddImage: React.FC = () => {
 
         {showDropdown && (
           <View style={styles.dropdownContainer}>
-            {category.map(item => (
+            {options.map((category, index) => (
               <TouchableOpacity
-                key={item.label}
+                key={index}
                 style={styles.dropdownItem}
-                onPress={() => selectCategory(item.label)}>
-                <Text>{item.label}</Text>
+                onPress={() => selectCategory(category)}>
+                <Text>{category}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -246,7 +251,7 @@ const styles = StyleSheet.create({
   dropdownItem: {
     color: 'black',
     fontWeight: '900',
-    backgroundColor: 'lighrgray',
+    backgroundColor: 'lightgray',
     padding: 10,
     marginTop: 3,
     borderRadius: 5,
