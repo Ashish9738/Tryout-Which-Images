@@ -2,15 +2,15 @@ from fastapi import HTTPException, UploadFile,Form
 from fastapi.responses import JSONResponse
 from config import AppConfig
 import base64
-import requests
+import json
 import binascii
+import requests
+from pydantic import BaseModel
+from typing import List 
 from database.database import collectionMeta,collectionResult
 from ciaos import save
 from typing import List 
-import re
 from models.model import Feedback,Metadata
-
-
 
 def test_model_v1(base64_str: str, model_name: str):
     if not all([base64_str, model_name]):
@@ -63,11 +63,13 @@ def fetch_metadata(query):
     except Exception as e:
          return {"error": f"Failed to fetch metadata: {str(e)}"}
 
-def fetch_imageKey(image):
+
+def fetch_imageKey(image: UploadFile):
     try:
         binary_data = image.file.read()
         encoded = binascii.b2a_base64(binary_data, newline=False)
         base64_string=encoded.decode('utf-8')
+       
         response = save(AppConfig.STORAGE_BASE_URL, "", base64_string)
         json_response = response.json()
         key = json_response.get('key') 
