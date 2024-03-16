@@ -15,20 +15,17 @@ import {
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
-import {api} from '../../utils/Api';
+import DropDown from '../DropDown/DropDown';
 
 const AddImage: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [base64images, setBase64Images] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [options, setOptions] = useState<string[]>([]);
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
     requestPermissions();
-    fetchCategories();
   }, []);
 
   const requestPermissions = async () => {
@@ -56,22 +53,6 @@ const AddImage: React.FC = () => {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(`${api}/select_option?query=category`);
-      const responseData = await response.json();
-      setOptions(responseData);
-      console.log('Fetched categories:', responseData);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  const selectCategory = (categoryKey: string) => {
-    setSelectedCategory(categoryKey);
-    setShowDropdown(false);
-  };
-
   const selectImages = async () => {
     try {
       const images = await ImagePicker.openPicker({
@@ -93,6 +74,10 @@ const AddImage: React.FC = () => {
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
     }
+  };
+
+  const selectCategory = (category: string) => {
+    setSelectedCategory(category);
   };
 
   const uploadImages = async () => {
@@ -140,31 +125,10 @@ const AddImage: React.FC = () => {
     <ScrollView style={styles.container}>
       <View>
         <Text style={styles.heading}>Add Images</Text>
-        <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={() => setShowDropdown(!showDropdown)}>
-          <Text style={styles.dropdownButtonText}>
-            {selectedCategory ? selectedCategory : 'Select Category'}
-          </Text>
-        </TouchableOpacity>
-
-        {showDropdown && (
-          <View style={styles.dropdownContainer}>
-            {options.map((category, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.dropdownItem}
-                onPress={() => selectCategory(category)}>
-                <Text>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
+        <DropDown onSelect={selectCategory} fetchType="category" />
         <TouchableOpacity onPress={selectImages}>
           <Text style={styles.selectImage}>Select Images</Text>
         </TouchableOpacity>
-
         <View style={styles.parent}>
           {selectedImages.map((image, index) => (
             <View key={index}>
@@ -176,7 +140,6 @@ const AddImage: React.FC = () => {
             </View>
           ))}
         </View>
-
         <TouchableOpacity onPress={uploadImages}>
           <Text style={styles.uploadImage}>Upload Images</Text>
           {isLoading && (
@@ -225,37 +188,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 20,
-  },
-  dropdownButton: {
-    marginLeft: 10,
-    marginRight: 10,
-    backgroundColor: 'lightgray',
-    padding: 15,
-    marginTop: 10,
-    borderRadius: 12,
-  },
-  dropdownButtonText: {
-    color: 'black',
-    textAlign: 'center',
-    fontSize: 19,
-    fontWeight: 'bold',
-  },
-  dropdownContainer: {
-    marginLeft: 10,
-    marginRight: 10,
-    backgroundColor: 'lightgray',
-    padding: 10,
-    marginTop: 5,
-    borderRadius: 5,
-  },
-  dropdownItem: {
-    color: 'black',
-    fontWeight: '900',
-    backgroundColor: 'lightgray',
-    padding: 10,
-    marginTop: 3,
-    borderRadius: 5,
-    alignItems: 'center',
   },
   uploadImage: {
     backgroundColor: '#000000',

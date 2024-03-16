@@ -1,56 +1,17 @@
-import base64
-import json
-from typing import List
-from fastapi import HTTPException, UploadFile
-from pydantic import BaseModel
-import requests
+from fastapi import HTTPException, UploadFile,Form
+from fastapi.responses import JSONResponse
 from config import AppConfig
-from database.database import collectionMeta, collectionResult, collectionCategory, collectionQuestion, collectionImageID
-
-class QuestionAnswer(BaseModel):
-    questionID:str
-    answer : str
-
-class Metadata(BaseModel):
-    type: str
-    value: str
-
-class Feedback(BaseModel):
-    modelName : str
-    imageKey : str
-    qa : List[QuestionAnswer]
-
-class Query(BaseModel):
-    query : str
+import base64
+import requests
+import binascii
+from database.database import collectionMeta,collectionResult
+from ciaos import save
+from typing import List 
+import re
+from models.model import Feedback,Metadata
 
 
-def read_model_data():
-    try:
-        with open('./models/models.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print('Error reading models.json:', e)
-        return []
 
-def read_questions_data():
-    try:
-        with open('./models/questions.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print('Error reading questions.json:', e)
-        return []
-    
-def read_categories():
-    try:
-        with open('./models/categories.json', 'r') as file:
-            data = json.load(file)
-        return data
-    except Exception as e:
-        print('Error reading Categories.json', e)
-        return []
-    
 def test_model_v1(base64_str: str, model_name: str):
     if not all([base64_str, model_name]):
         raise HTTPException(status_code=400, detail="Missing required parameters: base64 and model_name")
@@ -72,10 +33,11 @@ def test_model_v2(file: UploadFile):
         files = {'file': (file.filename, file.file.read(), file.content_type)}
         response = requests.post(f"{AppConfig.MAS_SERVICE_URL}{AppConfig.MAS_SERVICE_ENDPOINT}", files=files)
         
+
         if response.status_code == 200:
             try:
                 result = response.json()
-                return "No" if result == 0 else "Yes"
+                return "No" if result == 0 else "Yes" 
             except ValueError:
                 return {"error": "Failed to parse JSON response"}
         else:
@@ -83,7 +45,7 @@ def test_model_v2(file: UploadFile):
         
     except Exception as e:
         return {"error": f"Failed to complete the request: {str(e)}"}
-    
+
 def createFeedback(feedback: Feedback):
     try:
         feedback_id = collectionResult.insert_one(feedback.dict()).inserted_id
@@ -92,38 +54,23 @@ def createFeedback(feedback: Feedback):
     except Exception as e:
         return {"error": f"Failed to send feedback the request: {str(e)}"}
 
-def create_metadata(metadata: Metadata):
-    try:
-        metadata_dict = metadata.dict()
-        inserted_metadata = collectionImageID.insert_one(metadata_dict)
-        return {"message": "Metadata created successfully", "metadata_id": str(inserted_metadata.inserted_id)}
-        
-    except Exception as e:
-        return {"error": f"Failed to send metaFeedback the request: {str(e)}"}
-
-def read_model_data():
+def fetch_metadata(query):
     try:
         data = []
-        for document in collectionMeta.find():
+        for document in (collectionMeta.find({"type":query})):
             data.append(document["value"])
         return data
     except Exception as e:
-         return {"error": f"Failed to fetch category: {str(e)}"}
+         return {"error": f"Failed to fetch metadata: {str(e)}"}
 
-def read_category():
+def fetch_imageKey(image):
     try:
-        data = []
-        for document in collectionCategory.find():
-            data.append(document["category"])
-        return data
-    except Exception as e:
-         return {"error": f"Failed to fetch category: {str(e)}"}
-
-def read_question():
-    try:
-        data = []
-        for document in collectionQuestion.find():
-            data.append(document["q"])
-        return data
-    except Exception as e:
-         return {"error": f"Failed to fetch category: {str(e)}"}
+        binary_data = image.file.read()
+        encoded = binascii.b2a_base64(binary_data, newline=False)
+        base64_string=encoded.decode('utf-8')
+        response = save(AppConfig.STORAGE_BASE_URL, "", base64_string)
+        json_response = response.json()
+        key = json_response.get('key') 
+        return key
+    except HTTPException as e:
+        return JSONResponse(content={"error": str(e.detail)}, status_code=e.status_code)

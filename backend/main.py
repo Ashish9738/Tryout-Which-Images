@@ -1,16 +1,19 @@
-from typing import List, Optional
-from fastapi import FastAPI, File, Form, HTTPException,Query, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Query, HTTPException, Form, UploadFile, File
+from service.service import test_model_v1, test_model_v2,createFeedback,Metadata,Feedback, fetch_metadata,fetch_imageKey
 from fastapi.middleware.cors import CORSMiddleware
-from service.service import Feedback, create_metadata, createFeedback, read_category, read_model_data, read_question, test_model_v1, test_model_v2
+from fastapi.responses import JSONResponse
+from typing import List, Optional
+from config import AppConfig 
 from ciaos import save,get
-from config import AppConfig
+import json
+from models.model import Feedback,Metadata
+
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=AppConfig.ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,6 +35,7 @@ async def get_images(category: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.get("/test_model")
 async def test_model(base64: str = Query(..., description="Base64-encoded image data"), model_name: str = Query(..., description="Name of the model to use")):
    return test_model_v1(base64, model_name)
@@ -44,16 +48,10 @@ async def upload_file(file: UploadFile = File(...)):
 async def create_feedback(feedback:Feedback):
     return createFeedback(feedback)
 
+@app.get("/metadata")
+async def get_metadata(query:str):
+   return fetch_metadata(query)
 
-@app.get("/select_option")
-async def select_option(query:str):
-    if query=="model":
-        return read_model_data()
-    elif query=="category":
-        return read_category()
-    elif query=="question":
-        return read_question()
-    elif query=="imageMetadata":
-        return create_metadata()
-
-
+@app.get("/key")
+async def fetch_key(image: UploadFile = File(...)):
+    return fetch_imageKey(image)

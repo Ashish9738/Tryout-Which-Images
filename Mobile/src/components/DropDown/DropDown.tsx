@@ -1,94 +1,94 @@
 import React, {useState, useEffect} from 'react';
-import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
-import TestModelScreen from '../../screens/TestModelScreen';
-import {fetchModels} from '../../utils/Api';
+import {View, Text, StyleSheet} from 'react-native';
+import {Picker} from '@react-native-picker/picker';
+import {fetchCategory, fetchModels} from '../../utils/Api';
 
 interface Props {
   onSelect: (model: any) => void;
+  fetchType: 'category' | 'model'; // Indicates whether to fetch categories or models
 }
 
-const DropDown: React.FC<Props> = ({onSelect}) => {
-  const [pickerVisible, setPickerVisible] = useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState<any>(null);
-  const [models, setModels] = useState<any[]>([]);
+const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
+  const [options, setOptions] = useState<any[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [initialDataFetched, setInitialDataFetched] = useState<boolean>(false);
-
-  const fetchInitialModelData = async () => {
-    try {
-      const data = await fetchModels();
-      console.log(data);
-      setModels(data);
-      setInitialDataFetched(true);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error fetching initial model data:', error);
-        setError(`Error fetching models: ${error.message}`);
-      } else {
-        console.error('Unknown error fetching initial model data:', error);
-        setError('Unknown error fetching models. Please try again.');
-      }
-    }
-  };
-
-  const togglePicker = () => {
-    setPickerVisible(!pickerVisible);
-  };
-
-  const handleSelectModel = (model: any) => {
-    setSelectedModel(model);
-    onSelect(model);
-    togglePicker();
-  };
 
   useEffect(() => {
-    if (!initialDataFetched) {
-      fetchInitialModelData();
+    if (fetchType === 'category') {
+      fetchCategories();
+    } else if (fetchType === 'model') {
+      fetchModelsData();
     }
-  }, [initialDataFetched]);
+  }, [fetchType]);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await fetchCategory();
+      setOptions(data);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const fetchModelsData = async () => {
+    try {
+      const data = await fetchModels();
+      setOptions(data);
+    } catch (error) {
+      handleError(error);
+    }
+  };
+
+  const handleError = (error: any) => {
+    if (error instanceof Error) {
+      setError(`Error fetching data: ${error.message}`);
+    } else {
+      setError('Unknown error fetching data. Please try again.');
+    }
+  };
 
   return (
     <View>
-      <TouchableOpacity style={styles.buttonContainer} onPress={togglePicker}>
-        <Text style={styles.buttonText}>Select Model</Text>
-      </TouchableOpacity>
-      {pickerVisible && (
-        <TestModelScreen onSelect={handleSelectModel} models={models} />
+      {error ? (
+        <Text style={styles.error}>{error}</Text>
+      ) : (
+        <View style={styles.container}>
+          <Picker
+            selectedValue={selectedOption}
+            onValueChange={(itemValue: any) => {
+              setSelectedOption(itemValue);
+              onSelect(itemValue);
+            }}
+            style={styles.picker}>
+            <Picker.Item label={`Select ${fetchType}`} value={null} />
+            {options.map((option, index) => (
+              <Picker.Item
+                key={index}
+                label={option}
+                value={option}
+                style={styles.pickerItem}
+              />
+            ))}
+          </Picker>
+        </View>
       )}
-
-      {/* To display the Model which is been selected */}
-      <Text style={styles.selectedModel}>
-        Selected Model: {selectedModel ? selectedModel : 'None'}
-      </Text>
-
-      {/* Display error message if there's an error */}
-      {error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  selectedModel: {
-    fontSize: 17,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 15,
-    color: 'black',
-  },
-  buttonContainer: {
-    height: 50,
-    width: 370,
+  container: {
     marginBottom: 10,
-    backgroundColor: 'gray',
-    borderRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  buttonText: {
-    fontSize: 19,
-    color: 'white',
-    fontWeight: '400',
+  picker: {
+    height: 50,
+    width: '100%',
+    color: 'black',
+    fontWeight: 'bold',
+  },
+  pickerItem: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   error: {
     fontSize: 16,

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
-import {api} from '../../utils/Api';
+import DropDown from '../DropDown/DropDown'; // Import DropDown component
 
 interface ImageData {
   name: string;
@@ -23,28 +23,12 @@ const RetrieveImage: React.FC = () => {
   const [category, setSelectedCategory] = useState<string | null>(null);
   const [images, setImages] = useState<ImageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [options, setOptions] = useState<string[]>([]);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const navigation = useNavigation();
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get(`${api}/select_option?query=category`);
-      setOptions(response.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
   const selectCategory = (category: string) => {
     setSelectedCategory(category);
-    setShowDropdown(false);
   };
 
   const openTab = (photo: string) => {
@@ -98,29 +82,7 @@ const RetrieveImage: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={{width: windowWidth, height: windowHeight}}>
         <Text style={styles.heading}>Retrieve Images</Text>
-
-        <View style={styles.dropdownContainer}>
-          <TouchableOpacity
-            style={styles.dropdownButton}
-            onPress={() => setShowDropdown(!showDropdown)}>
-            <Text style={styles.dropdownButtonText}>
-              {category ? category : 'Select Category'}
-            </Text>
-          </TouchableOpacity>
-          {showDropdown && (
-            <View style={styles.dropdown}>
-              {options.map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.dropdownItem}
-                  onPress={() => selectCategory(item)}>
-                  <Text>{item}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
-
+        <DropDown onSelect={selectCategory} fetchType="category" />
         <TouchableOpacity onPress={fetchImages}>
           <Text style={styles.retrieveBtn}>Retrieve Image</Text>
           {isLoading && (
@@ -129,7 +91,6 @@ const RetrieveImage: React.FC = () => {
             </View>
           )}
         </TouchableOpacity>
-
         <View style={styles.parent}>
           {images.map((itemm, index) => (
             <View key={index}>
@@ -180,44 +141,6 @@ const styles = StyleSheet.create({
   child: {
     aspectRatio: 1,
     margin: 5,
-  },
-  dropdownContainer: {
-    backgroundColor: 'lightgray',
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    width: 372,
-    borderRadius: 12,
-    marginBottom: 10,
-  },
-  dropdownButton: {
-    backgroundColor: 'lightgray',
-    padding: 5,
-    borderRadius: 12,
-    textAlign: 'center',
-    paddingRight: 45,
-  },
-  dropdownButtonText: {
-    color: 'black',
-    textAlign: 'center',
-    paddingLeft: 50,
-    fontSize: 19,
-    fontWeight: 'bold',
-  },
-  dropdown: {
-    borderWidth: 1,
-    borderColor: 'lightgray',
-    marginTop: 5,
-    borderRadius: 5,
-  },
-  dropdownItem: {
-    backgroundColor: 'lightgray',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    paddingLeft: 50,
-    marginVertical: 3,
-    alignItems: 'center',
-    paddingRight: 48,
   },
   heading: {
     color: 'black',

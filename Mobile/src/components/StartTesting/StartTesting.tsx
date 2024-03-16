@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
-  Button,
   Alert,
   Image,
   Platform,
@@ -13,9 +12,8 @@ import {
 } from 'react-native';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
-import {RadioButton} from 'react-native-paper';
-import * as RNFS from 'react-native-fs';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import RNFS from 'react-native-fs';
 import DropDown from '../DropDown/DropDown';
 import {api} from '../../utils/Api';
 import Feedback from '../Feedback/Feedback';
@@ -23,16 +21,10 @@ import Feedback from '../Feedback/Feedback';
 const StartTesting: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>('Choose Model');
   const [apiResults, setApiResults] = useState<any>({});
-  const [feedback, setFeedback] = useState<boolean[]>([false, false]);
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
-  const [base64images, setBase64Images] = useState<string[]>([]);
-  const [metadataResults, setMetadataResults] = useState(null);
-  const [isFeedbackSubmitted, setIsFeedbackSubmitted] =
-    useState<boolean>(false);
-  const [question1Answer, setQuestion1Answer] = useState<string>('');
-  const [question2Answer, setQuestion2Answer] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [apiResultsLoaded, setApiResultsLoaded] = useState<boolean>(false);
+  const [fetchMetadata, setFetchMetadata] = useState<any>({});
 
   useEffect(() => {
     requestPermissions();
@@ -98,17 +90,34 @@ const StartTesting: React.FC = () => {
         name: image.filename || 'image.jpg',
       });
 
-      // TO_DO : ADD FETCH METADATA FOR THE IMAGE
-
       const fileResponse = await axios.post(`${api}/test_model_v2`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      setApiResults(fileResponse.data);
+      const {data} = fileResponse;
+      console.log(data);
+
+      if (data && !data.error) {
+        setApiResults(data);
+
+        const response = await axios.post(`${api}/key`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        const metadata = response.data;
+        setFetchMetadata(metadata);
+        setApiResultsLoaded(true);
+      } else {
+        Alert.alert(
+          'Error',
+          data.error || 'Failed to submit test. Please try again.',
+        );
+      }
       setIsLoading(false);
-      setApiResultsLoaded(true);
     } catch (error) {
       console.error('Error submitting test:', error);
       Alert.alert('Error', 'Failed to submit test. Please try again.');
@@ -116,46 +125,9 @@ const StartTesting: React.FC = () => {
     }
   };
 
-  const renderResultsComponent = () => {
-    if (apiResults instanceof Promise) {
-      return <ActivityIndicator size="large" color="black" />;
-    }
-
-    if (apiResults && apiResults.error) {
-      return (
-        <View style={styles.container}>
-          <Text style={styles.error}>Error: {apiResults.error}</Text>
-        </View>
-      );
-    }
-
-    if (
-      Object.keys(apiResults).length === 0 &&
-      apiResults.constructor === Object
-    ) {
-      return null;
-    }
-
-    return (
-      <View style={styles.container}>
-        <Text style={styles.header}>API Results</Text>
-        <View style={styles.table}>
-          <View style={styles.row}>
-            <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
-            <Text style={[styles.cell, styles.headerCell]}>Value</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.cell}>isElephant</Text>
-            <Text style={styles.cell}>{apiResults}</Text>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-      <DropDown onSelect={model => setSelectedModel(model)} />
+      <DropDown onSelect={setSelectedModel} fetchType="model" />
       <TouchableOpacity onPress={selectImages} style={styles.customButton}>
         <Text style={styles.customButtonText}>Choose Image</Text>
       </TouchableOpacity>
@@ -176,12 +148,31 @@ const StartTesting: React.FC = () => {
 
       {isLoading ? (
         <ActivityIndicator size="large" color="black" />
-      ) : (
-        renderResultsComponent()
+      ) : apiResultsLoaded ? (
+        <Feedback model={selectedModel} setModel={setSelectedModel} />
+      ) : null}
+
+      {apiResultsLoaded && (
+        <View style={styles.container}>
+          <Text style={styles.header}>API Results</Text>
+          <View style={styles.table}>
+            <View style={styles.row}>
+              <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
+              <Text style={[styles.cell, styles.headerCell]}>Value</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.cell}>isElephant</Text>
+              <Text style={styles.cell}>{apiResults}</Text>
+            </View>
+          </View>
+        </View>
       )}
 
       {apiResultsLoaded && (
-        <Feedback model={selectedModel} setModel={setSelectedModel} />
+        <View style={styles.container}>
+          <Text style={styles.header}>Image Metadata</Text>
+          <Text>{fetchMetadata}</Text>
+        </View>
       )}
     </ScrollView>
   );
@@ -210,6 +201,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 18,
   },
+  error: {
+    color: 'red',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 10,
+  },
+  submitButton: {
+    backgroundColor: 'black',
+    paddingVertical: 15,
+    paddingHorizontal: 24,
+    borderRadius: 6,
+    marginBottom: 20,
+    marginTop: 15,
+  },
   table: {
     borderWidth: 1,
     borderColor: 'black',
@@ -232,20 +237,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
     color: 'white',
     fontWeight: 'bold',
-  },
-  error: {
-    color: 'red',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 10,
-  },
-  submitButton: {
-    backgroundColor: 'black',
-    paddingVertical: 15,
-    paddingHorizontal: 24,
-    borderRadius: 6,
-    marginBottom: 20,
-    marginTop: 15,
   },
   submitButtonText: {
     color: 'white',
