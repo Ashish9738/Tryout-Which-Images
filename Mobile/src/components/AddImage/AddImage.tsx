@@ -162,7 +162,7 @@ const AddImage: React.FC = () => {
         )}
 
         <TouchableOpacity onPress={selectImages}>
-          <Text style={styles.loadingContainer}>Select Images</Text>
+          <Text style={styles.selectImage}>Select Images</Text>
         </TouchableOpacity>
 
         <View style={styles.parent}>
@@ -194,10 +194,10 @@ const styles = StyleSheet.create({
   container: {
     display: 'flex',
     flex: 1,
-    backgroundColor: '#586f7c',
+    backgroundColor: 'white',
     padding: 20,
   },
-  loadingContainer: {
+  selectImage: {
     backgroundColor: '#000000',
     color: 'white',
     fontSize: 20,
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 12,
   },
   parent: {
     flex: 1,
@@ -232,12 +232,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
     padding: 15,
     marginTop: 10,
-    borderRadius: 5,
+    borderRadius: 12,
   },
   dropdownButtonText: {
     color: 'black',
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 19,
     fontWeight: 'bold',
   },
   dropdownContainer: {
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     margin: 10,
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 12,
   },
 });
 

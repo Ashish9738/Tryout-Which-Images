@@ -9,29 +9,6 @@ interface MenuProps {
 const Menu: React.FC<MenuProps> = ({navigation}) => {
   return (
     <View style={styles.container}>
-      <Text
-        style={{
-          fontWeight: 'bold',
-          fontSize: 40,
-          fontFamily: 'Roboto',
-          color: '#000000',
-          textAlign: 'center',
-          padding: 20,
-          marginTop: 20,
-          marginBottom: 50,
-        }}>
-        Which Images
-      </Text>
-      <Text
-        style={{
-          fontWeight: 'bold',
-          fontSize: 32,
-          color: '#000000',
-          textAlign: 'center',
-          marginBottom: 50,
-        }}>
-        MENU
-      </Text>
       <View
         style={{
           flexDirection: 'column',
@@ -40,21 +17,31 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
         }}>
         <TouchableOpacity onPress={() => navigation.navigate('AddImage')}>
           <View style={styles.iconContainer}>
-            <Icon name="plus-square" size={50} color="green" />
-            <Text style={{color: 'green'}}>Add Image</Text>
+            <Icon style={styles.icon} name="camera" size={50} color="white" />
+            <Text style={styles.iconTitle}>Add Images</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate('RetrieveImageScreen')}>
           <View style={styles.iconContainer}>
-            <Icon name="caret-square-o-up" size={50} color="blue" />
-            <Text style={{color: 'blue'}}>Retrieve Image</Text>
+            <Icon
+              style={styles.icon}
+              name="briefcase"
+              size={50}
+              color="white"
+            />
+            <Text style={styles.iconTitle}>Retrieve Images</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('StartTesting')}>
           <View style={styles.iconContainer}>
-            <Icon name="pencil-square" size={50} color="orange" />
-            <Text style={{color: 'orange'}}>Start Testing</Text>
+            <Icon
+              style={styles.icon}
+              name="pencil-square"
+              size={50}
+              color="white"
+            />
+            <Text style={styles.iconTitleStartTesting}>Start Testing</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -64,17 +51,44 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
+    display: 'flex',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
     flex: 1,
-    backgroundColor: '#586f7c',
+    backgroundColor: 'white',
   },
   iconContainer: {
-    backgroundColor: '#000000',
+    display: 'flex',
+    flexDirection: 'row',
+    margin: 0,
+    backgroundColor: 'rgba(0,0,0,1)',
     alignItems: 'center',
-    borderColor: '#0d1b2a',
-    borderWidth: 1,
-    borderRadius: 10,
+    width: 372,
+    textAlign: 'center',
+    borderWidth: 1.5,
+    borderRadius: 20,
     padding: 15,
+    marginLeft: 20,
     marginBottom: 20,
+  },
+  icon: {
+    marginLeft: 30,
+  },
+  iconTitle: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 10,
+    marginLeft: 50,
+    marginBottom: 10,
+    fontSize: 20,
+  },
+  iconTitleStartTesting: {
+    color: 'white',
+    textAlign: 'center',
+    marginTop: 10,
+    marginLeft: 58,
+    marginBottom: 10,
+    fontSize: 20,
   },
 });
 

@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
-import {api} from '../../utils/Api'; 
+import {api} from '../../utils/Api';
 
 interface ImageData {
   name: string;
@@ -97,7 +97,7 @@ const RetrieveImage: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={{width: windowWidth, height: windowHeight}}>
-        <Text style={styles.heading}>Retrieve Image</Text>
+        <Text style={styles.heading}>Retrieve Images</Text>
 
         <View style={styles.dropdownContainer}>
           <TouchableOpacity
@@ -122,7 +122,7 @@ const RetrieveImage: React.FC = () => {
         </View>
 
         <TouchableOpacity onPress={fetchImages}>
-          <Text style={styles.loadingContainer}>Retrieve Image</Text>
+          <Text style={styles.retrieveBtn}>Retrieve Image</Text>
           {isLoading && (
             <View>
               <ActivityIndicator size="large" color="#0000ff" />
@@ -153,19 +153,23 @@ const RetrieveImage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#586f7c',
+    backgroundColor: 'white',
     padding: 20,
   },
-  loadingContainer: {
+  retrieveBtn: {
     backgroundColor: 'black',
     color: 'white',
+    width: 372,
+    alignItems: 'center',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
-    padding: 10,
-    borderRadius: 5,
-    paddingRight: 40,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 10,
   },
+
   parent: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -181,20 +185,22 @@ const styles = StyleSheet.create({
     backgroundColor: 'lightgray',
     paddingVertical: 10,
     paddingHorizontal: 5,
-    borderRadius: 5,
+    width: 372,
+    borderRadius: 12,
     marginBottom: 10,
   },
   dropdownButton: {
     backgroundColor: 'lightgray',
     padding: 5,
-    borderRadius: 5,
+    borderRadius: 12,
     textAlign: 'center',
     paddingRight: 45,
   },
   dropdownButtonText: {
     color: 'black',
     textAlign: 'center',
-    fontSize: 16,
+    paddingLeft: 50,
+    fontSize: 19,
     fontWeight: 'bold',
   },
   dropdown: {
@@ -208,6 +214,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
+    paddingLeft: 50,
     marginVertical: 3,
     alignItems: 'center',
     paddingRight: 48,

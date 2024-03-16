@@ -190,7 +190,7 @@ const StartTesting: React.FC = () => {
 const styles = StyleSheet.create({
   scrollViewContainer: {
     flexGrow: 1,
-    backgroundColor: '#586f7c',
+    backgroundColor: 'white',
     padding: 20,
   },
   photo: {
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   table: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'black',
     borderRadius: 10,
     overflow: 'hidden',
     minWidth: '100%',
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
   },
   headerCell: {
-    backgroundColor: '#000000',
+    backgroundColor: 'black',
     color: 'white',
     fontWeight: 'bold',
   },
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: 'black',
-    paddingVertical: 11,
+    paddingVertical: 15,
     paddingHorizontal: 24,
     borderRadius: 6,
     marginBottom: 20,
@@ -249,20 +249,20 @@ const styles = StyleSheet.create({
   },
   submitButtonText: {
     color: 'white',
-    fontSize: 17,
+    fontSize: 19,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   customButton: {
-    backgroundColor: 'gray',
-    paddingVertical: 11,
+    backgroundColor: 'black',
+    paddingVertical: 15,
     paddingHorizontal: 24,
     borderRadius: 6,
     marginBottom: 15,
   },
   customButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 19,
     fontWeight: 'bold',
     textAlign: 'center',
   },

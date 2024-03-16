@@ -14,11 +14,31 @@ const AppNavigator: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Menu">
         <Stack.Group>
-          <Stack.Screen name="Menu" component={Menu} />
-          <Stack.Screen name="AddImage" component={AddImage} />
-          <Stack.Screen name="RetrieveImageScreen" component={RetrieveImage} />
-          <Stack.Screen name="StartTesting" component={StartTesting} />
-          <Stack.Screen name="OpenImage" component={OpenImage} />
+          <Stack.Screen
+            name="Menu"
+            component={Menu}
+            options={{title: 'Which Images'}}
+          />
+          <Stack.Screen
+            name="AddImage"
+            component={AddImage}
+            options={{title: ''}}
+          />
+          <Stack.Screen
+            name="RetrieveImageScreen"
+            component={RetrieveImage}
+            options={{title: ''}}
+          />
+          <Stack.Screen
+            name="StartTesting"
+            component={StartTesting}
+            options={{title: ''}}
+          />
+          <Stack.Screen
+            name="OpenImage"
+            component={OpenImage}
+            options={{title: ''}}
+          />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

@@ -69,23 +69,24 @@ const DropDown: React.FC<Props> = ({onSelect}) => {
 
 const styles = StyleSheet.create({
   selectedModel: {
-    fontSize: 18,
+    fontSize: 17,
+    fontWeight: '600',
     textAlign: 'center',
     marginTop: 10,
     marginBottom: 15,
-    color: '#000000',
+    color: 'black',
   },
   buttonContainer: {
     height: 50,
     width: 370,
     marginBottom: 10,
-    backgroundColor: '#2f4550',
+    backgroundColor: 'gray',
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 19,
     color: 'white',
     fontWeight: '400',
   },
