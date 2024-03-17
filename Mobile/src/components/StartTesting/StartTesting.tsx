@@ -13,7 +13,6 @@ import {
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import RNFS from 'react-native-fs';
 import DropDown from '../DropDown/DropDown';
 import {api} from '../../utils/Api';
 import Feedback from '../Feedback/Feedback';
@@ -61,6 +60,12 @@ const StartTesting: React.FC = () => {
         multiple: true,
         cropping: true,
       });
+
+      if (images.length > 1) {
+        Alert.alert('Error', 'Please select a single image for testing.');
+        return;
+      }
+
       setSelectedImages(images);
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
@@ -158,7 +163,12 @@ const StartTesting: React.FC = () => {
       {apiResultsLoaded && (
         <View style={styles.container}>
           <Text style={styles.header}>Image Metadata</Text>
-          <Text style={styles.imageMetadata}>Image key : {fetchMetadata}</Text>
+          <View style={styles.imageMetadata}>
+            <Text>Image saved sucessfully!</Text>
+            <Text style={{textAlign: 'center'}}>
+              Image key : {fetchMetadata}
+            </Text>
+          </View>
         </View>
       )}
 
@@ -243,6 +253,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     textAlign: 'center',
+    color: 'black',
+    fontWeight: '500',
     borderRightWidth: 1,
     borderColor: '#ccc',
   },
@@ -273,7 +285,8 @@ const styles = StyleSheet.create({
   imageMetadata: {
     color: 'black',
     backgroundColor: 'lightgray',
-    padding: 10,
+    padding: 15,
+    borderRadius: 5,
   },
 });
 

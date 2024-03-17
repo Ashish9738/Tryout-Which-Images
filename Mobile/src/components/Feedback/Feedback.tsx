@@ -83,12 +83,21 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
   };
 
   return (
-    <View style={{marginLeft: 10, marginTop: 15, marginRight: 10}}>
+    <View style={{marginTop: 15}}>
+      <Text style={styles.header}>Feedback</Text>
       {questions.length > 0 ? (
         questions.map((question, index) => (
           <View key={index} style={{marginBottom: 10}}>
-            <Text style={styles.header}>Feedback</Text>
-            <Text style={{marginBottom: 5}}>{question}</Text>
+            <Text
+              style={{
+                marginBottom: 5,
+                fontWeight: '500',
+                color: 'black',
+                fontSize: 16,
+                marginLeft: 8,
+              }}>
+              {question}
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -103,13 +112,36 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
                     flexDirection: 'row',
                     alignItems: 'center',
                     marginRight: 20,
+                    marginLeft: 8,
                   }}>
-                  <RadioButton value={'Yes'} />
-                  <Text>Yes</Text>
+                  <RadioButton value={'Yes'} color="black" />
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      color: 'black',
+                      fontSize: 16,
+                      marginLeft: 4,
+                    }}>
+                    Yes
+                  </Text>
                 </View>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <RadioButton value={'No'} />
-                  <Text>No</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 20,
+                    marginLeft: 8,
+                  }}>
+                  <RadioButton value={'No'} color="black" />
+                  <Text
+                    style={{
+                      fontWeight: '500',
+                      color: 'black',
+                      fontSize: 16,
+                      marginLeft: 4,
+                    }}>
+                    No
+                  </Text>
                 </View>
               </RadioButton.Group>
             </View>
@@ -118,11 +150,13 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
       ) : (
         <Text>No questions available</Text>
       )}
-      <Button
-        title="Submit Feedback"
-        onPress={submitFeedback}
-        color="#000000"
-      />
+      <View style={styles.submitButton}>
+        <Button
+          title="Submit Feedback"
+          onPress={submitFeedback}
+          color="#000000"
+        />
+      </View>
     </View>
   );
 };
@@ -130,8 +164,21 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
 const styles = StyleSheet.create({
   header: {
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 14,
     fontSize: 18,
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  submitButton: {
+    backgroundColor: 'black',
+    paddingVertical: 10,
+    paddingHorizontal: 32,
+    borderRadius: 6,
+    marginBottom: 20,
+    marginTop: 15,
+    width: '100%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
 });
 

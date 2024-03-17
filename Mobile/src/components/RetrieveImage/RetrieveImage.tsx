@@ -8,11 +8,11 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
-import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
-import DropDown from '../DropDown/DropDown'; // Import DropDown component
+import DropDown from '../DropDown/DropDown';
 
 interface ImageData {
   name: string;
@@ -24,7 +24,6 @@ const RetrieveImage: React.FC = () => {
   const [images, setImages] = useState<ImageData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const windowWidth = Dimensions.get('window').width;
-  const windowHeight = Dimensions.get('window').height;
   const navigation = useNavigation();
 
   const selectCategory = (category: string) => {
@@ -80,30 +79,26 @@ const RetrieveImage: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={{width: windowWidth, height: windowHeight}}>
+      <View style={{flex: 1}}>
         <Text style={styles.heading}>Retrieve Images</Text>
         <DropDown onSelect={selectCategory} fetchType="category" />
         <TouchableOpacity onPress={fetchImages}>
           <Text style={styles.retrieveBtn}>Retrieve Image</Text>
-          {isLoading && (
-            <View>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          )}
+          {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
         </TouchableOpacity>
         <View style={styles.parent}>
           {images.map((itemm, index) => (
-            <View key={index}>
-              <TouchableOpacity
-                onPress={() => {
-                  openTab(itemm.data);
-                }}>
-                <Image
-                  style={[styles.child, {width: windowWidth / 3.2}]}
-                  source={{uri: `data:image/jpeg;base64,${itemm.data}`}}
-                />
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              key={index}
+              onPress={() => {
+                openTab(itemm.data);
+              }}
+              style={styles.childContainer}>
+              <Image
+                style={styles.child}
+                source={{uri: `data:image/jpeg;base64,${itemm.data}`}}
+              />
+            </TouchableOpacity>
           ))}
         </View>
       </View>
@@ -130,26 +125,30 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 10,
   },
-
   parent: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
-    marginHorizontal: -5,
+    justifyContent: 'flex-start',
     marginTop: 10,
   },
-  child: {
+  childContainer: {
+    width: '33.333%',
     aspectRatio: 1,
     margin: 5,
+  },
+  child: {
+    flex: 1,
+    borderRadius: 10,
   },
   heading: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 50,
+    fontSize: 46,
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 20,
-    marginRight: 30,
+    marginRight: 8,
+    marginLeft: 5,
   },
 });
 

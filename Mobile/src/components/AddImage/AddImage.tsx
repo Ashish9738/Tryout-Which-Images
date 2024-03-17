@@ -59,18 +59,8 @@ const AddImage: React.FC = () => {
         multiple: true,
         cropping: true,
       });
-      setSelectedImages(images);
 
-      const base64ImagesArray = await Promise.all(
-        images.map(async image => {
-          const filePath =
-            Platform.OS === 'android'
-              ? image.path.replace('file://', '')
-              : image.path;
-          return await RNFS.readFile(filePath, 'base64');
-        }),
-      );
-      setBase64Images(base64ImagesArray);
+      setSelectedImages(prevImages => [...prevImages, ...images]);
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
     }
@@ -87,7 +77,7 @@ const AddImage: React.FC = () => {
     }
 
     if (selectedImages.length === 0) {
-      Alert.alert('Error', 'Please select at least one image to upload.');
+      Alert.alert('Error', 'Please select atleast one image to upload.');
       return;
     }
 
@@ -144,7 +134,7 @@ const AddImage: React.FC = () => {
           <Text style={styles.uploadImage}>Upload Images</Text>
           {isLoading && (
             <View>
-              <ActivityIndicator size="large" color="#0000ff" />
+              <ActivityIndicator size="large" color="black" />
             </View>
           )}
         </TouchableOpacity>
