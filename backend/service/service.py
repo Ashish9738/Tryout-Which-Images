@@ -64,15 +64,14 @@ def fetch_metadata(query):
          return {"error": f"Failed to fetch metadata: {str(e)}"}
 
 
-def fetch_imageKey(image: UploadFile):
+def fetch_image_metadata(binary_data: bytes) -> str:
     try:
-        binary_data = image.file.read()
         encoded = binascii.b2a_base64(binary_data, newline=False)
-        base64_string=encoded.decode('utf-8')
+        base64_string = encoded.decode('utf-8')
        
         response = save(AppConfig.STORAGE_BASE_URL, "", base64_string)
         json_response = response.json()
         key = json_response.get('key') 
         return key
-    except HTTPException as e:
-        return JSONResponse(content={"error": str(e.detail)}, status_code=e.status_code)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

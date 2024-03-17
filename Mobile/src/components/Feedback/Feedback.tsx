@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Button, Alert} from 'react-native';
+import {Text, View, Button, Alert, StyleSheet} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {api} from '../../utils/Api';
 
 interface FeedbackProps {
   model: string;
-  setModel: React.Dispatch<React.SetStateAction<string>>;
+  imageKey: string;
+  apiResponse: string;
 }
 
-const Feedback: React.FC<FeedbackProps> = ({model}) => {
+const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
   const [questions, setQuestions] = useState<string[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
@@ -20,7 +21,7 @@ const Feedback: React.FC<FeedbackProps> = ({model}) => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`${api}/select_option?query=question`);
+      const response = await fetch(`${api}/metadata?query=question`);
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
@@ -56,7 +57,8 @@ const Feedback: React.FC<FeedbackProps> = ({model}) => {
         },
         body: JSON.stringify({
           modelName: model,
-          imageKey: '',
+          imageKey: imageKey,
+          apiResponse: apiResponse,
           qa: [
             {
               questionID: questions[0],
@@ -85,6 +87,7 @@ const Feedback: React.FC<FeedbackProps> = ({model}) => {
       {questions.length > 0 ? (
         questions.map((question, index) => (
           <View key={index} style={{marginBottom: 10}}>
+            <Text style={styles.header}>Feedback</Text>
             <Text style={{marginBottom: 5}}>{question}</Text>
             <View
               style={{
@@ -123,5 +126,13 @@ const Feedback: React.FC<FeedbackProps> = ({model}) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  header: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+    fontSize: 18,
+  },
+});
 
 export default Feedback;

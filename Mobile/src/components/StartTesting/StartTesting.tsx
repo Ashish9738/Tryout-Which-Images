@@ -102,7 +102,16 @@ const StartTesting: React.FC = () => {
       if (data && !data.error) {
         setApiResults(data);
 
-        const response = await axios.post(`${api}/key`, formData, {
+        const formDataKey = new FormData();
+        const image = selectedImages[0];
+
+        formDataKey.append('image', {
+          uri: image.path,
+          type: image.mime,
+          name: image.filename || 'image.jpg',
+        });
+
+        const response = await axios.post(`${api}/key`, formDataKey, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -146,11 +155,12 @@ const StartTesting: React.FC = () => {
         <Text style={styles.submitButtonText}>SUBMIT TEST</Text>
       </TouchableOpacity>
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="black" />
-      ) : apiResultsLoaded ? (
-        <Feedback model={selectedModel} setModel={setSelectedModel} />
-      ) : null}
+      {apiResultsLoaded && (
+        <View style={styles.container}>
+          <Text style={styles.header}>Image Metadata</Text>
+          <Text style={styles.imageMetadata}>Image key : {fetchMetadata}</Text>
+        </View>
+      )}
 
       {apiResultsLoaded && (
         <View style={styles.container}>
@@ -168,12 +178,15 @@ const StartTesting: React.FC = () => {
         </View>
       )}
 
-      {apiResultsLoaded && (
-        <View style={styles.container}>
-          <Text style={styles.header}>Image Metadata</Text>
-          <Text>{fetchMetadata}</Text>
-        </View>
-      )}
+      {isLoading ? (
+        <ActivityIndicator size="large" color="black" />
+      ) : apiResultsLoaded ? (
+        <Feedback
+          model={selectedModel}
+          imageKey={fetchMetadata}
+          apiResponse={apiResults}
+        />
+      ) : null}
     </ScrollView>
   );
 };
@@ -256,6 +269,11 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  imageMetadata: {
+    color: 'black',
+    backgroundColor: 'lightgray',
+    padding: 10,
   },
 });
 
