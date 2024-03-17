@@ -1,15 +1,14 @@
 import React, {useState, useEffect} from 'react';
 import {
-  Text,
   View,
-  Button,
+  Text,
   Alert,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {api} from '../../utils/Api';
-import {white} from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 interface FeedbackProps {
   model: string;
@@ -22,6 +21,7 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
   }>({});
+  const [loading, setLoading] = useState<boolean>(false); // State for loading animation
 
   useEffect(() => {
     fetchQuestions();
@@ -58,6 +58,8 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
         return;
       }
 
+      setLoading(true);
+
       const response = await fetch(`${api}/feedback`, {
         method: 'POST',
         headers: {
@@ -87,6 +89,9 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
       Alert.alert('Success', 'Feedback submitted successfully');
     } catch (error) {
       console.error('Error submitting feedback:', error);
+      Alert.alert('Error', 'Failed to submit feedback. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -158,16 +163,15 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
       ) : (
         <Text>No questions available</Text>
       )}
-      <TouchableOpacity onPress={submitFeedback} style={[styles.submitButton]}>
-        <Text
-          style={{
-            color: 'white',
-            fontSize: 16,
-            textAlign: 'center',
-            fontWeight: 'bold',
-          }}>
-          Submit Feedback
-        </Text>
+      <TouchableOpacity
+        onPress={submitFeedback}
+        style={[styles.submitButton, loading && styles.disabledButton]}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.submitButtonText}>Submit Feedback</Text>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -192,6 +196,15 @@ const styles = StyleSheet.create({
     width: '100%',
     marginLeft: 'auto',
     marginRight: 'auto',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
 });
 
