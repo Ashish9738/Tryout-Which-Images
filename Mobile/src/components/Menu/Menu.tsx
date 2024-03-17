@@ -70,7 +70,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginLeft: 20,
     marginBottom: 20,
-    marginRight: 16,
+    marginRight: 18,
   },
   icon: {
     marginLeft: 30,
