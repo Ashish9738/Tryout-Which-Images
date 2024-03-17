@@ -26,7 +26,7 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
           <View style={styles.iconContainer}>
             <Icon
               style={styles.icon}
-              name="briefcase"
+              name="caret-square-o-up"
               size={50}
               color="white"
             />
@@ -35,12 +35,7 @@ const Menu: React.FC<MenuProps> = ({navigation}) => {
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('StartTesting')}>
           <View style={styles.iconContainer}>
-            <Icon
-              style={styles.icon}
-              name="pencil-square"
-              size={50}
-              color="white"
-            />
+            <Icon style={styles.icon} name="search" size={50} color="white" />
             <Text style={styles.iconTitleStartTesting}>Start Testing</Text>
           </View>
         </TouchableOpacity>

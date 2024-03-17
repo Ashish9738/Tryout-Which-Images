@@ -24,6 +24,8 @@ const StartTesting: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [apiResultsLoaded, setApiResultsLoaded] = useState<boolean>(false);
   const [fetchMetadata, setFetchMetadata] = useState<any>({});
+  const [questions, setQuestions] = useState<string[]>([]);
+  const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     requestPermissions();
@@ -139,8 +141,31 @@ const StartTesting: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await fetch(`${api}/metadata?query=question`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch questions');
+      }
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setQuestions(data);
+        setQuestionsLoaded(true);
+      } else {
+        throw new Error('Invalid data format received');
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+      <Text style={styles.heading}>Test the Model</Text>
       <DropDown onSelect={setSelectedModel} fetchType="model" />
       <TouchableOpacity onPress={selectImages} style={styles.customButton}>
         <Text style={styles.customButtonText}>Choose Image</Text>
@@ -157,46 +182,44 @@ const StartTesting: React.FC = () => {
       </View>
 
       <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>SUBMIT TEST</Text>
+        <Text style={styles.submitButtonText}>Submit Test</Text>
       </TouchableOpacity>
 
-      {apiResultsLoaded && (
-        <View style={styles.container}>
-          <Text style={styles.header}>Image Metadata</Text>
-          <View style={styles.imageMetadata}>
-            <Text>Image saved sucessfully!</Text>
-            <Text style={{textAlign: 'center'}}>
-              Image key : {fetchMetadata}
-            </Text>
-          </View>
-        </View>
-      )}
-
-      {apiResultsLoaded && (
-        <View style={styles.container}>
-          <Text style={styles.header}>API Results</Text>
-          <View style={styles.table}>
-            <View style={styles.row}>
-              <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
-              <Text style={[styles.cell, styles.headerCell]}>Value</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.cell}>isElephant</Text>
-              <Text style={styles.cell}>{apiResults}</Text>
+      {apiResultsLoaded && questionsLoaded && (
+        <>
+          <View style={styles.container}>
+            <Text style={styles.header}>Image Metadata</Text>
+            <View style={styles.imageMetadata}>
+              <Text>Image saved successfully!</Text>
+              <Text style={{textAlign: 'center'}}>
+                Image key : {fetchMetadata}
+              </Text>
             </View>
           </View>
-        </View>
+
+          <View style={styles.container}>
+            <Text style={styles.header}>API Results</Text>
+            <View style={styles.table}>
+              <View style={styles.row}>
+                <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
+                <Text style={[styles.cell, styles.headerCell]}>Value</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.cell}>isElephant</Text>
+                <Text style={styles.cell}>{apiResults}</Text>
+              </View>
+            </View>
+          </View>
+
+          <Feedback
+            model={selectedModel}
+            imageKey={fetchMetadata}
+            apiResponse={apiResults}
+          />
+        </>
       )}
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="black" />
-      ) : apiResultsLoaded ? (
-        <Feedback
-          model={selectedModel}
-          imageKey={fetchMetadata}
-          apiResponse={apiResults}
-        />
-      ) : null}
+      {isLoading && <ActivityIndicator size="large" color="black" />}
     </ScrollView>
   );
 };
@@ -229,6 +252,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 10,
+  },
+  heading: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 46,
+    textAlign: 'center',
+    marginTop: 20,
+    marginBottom: 20,
+    marginRight: 8,
+    marginLeft: 5,
   },
   submitButton: {
     backgroundColor: 'black',

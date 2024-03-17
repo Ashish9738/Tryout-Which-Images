@@ -1,7 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {Text, View, Button, Alert, StyleSheet} from 'react-native';
+import {
+  Text,
+  View,
+  Button,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import {RadioButton} from 'react-native-paper';
 import {api} from '../../utils/Api';
+import {white} from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
 
 interface FeedbackProps {
   model: string;
@@ -150,13 +158,17 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
       ) : (
         <Text>No questions available</Text>
       )}
-      <View style={styles.submitButton}>
-        <Button
-          title="Submit Feedback"
-          onPress={submitFeedback}
-          color="#000000"
-        />
-      </View>
+      <TouchableOpacity onPress={submitFeedback} style={[styles.submitButton]}>
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 16,
+            textAlign: 'center',
+            fontWeight: 'bold',
+          }}>
+          Submit Feedback
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -171,6 +183,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: 'black',
+    color: 'white',
     paddingVertical: 10,
     paddingHorizontal: 32,
     borderRadius: 6,
