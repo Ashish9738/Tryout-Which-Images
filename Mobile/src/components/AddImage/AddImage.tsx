@@ -123,7 +123,7 @@ const AddImage: React.FC = () => {
           {selectedImages.map((image, index) => (
             <View key={index}>
               <Image
-                style={[styles.child, {width: windowWidth / 3.2}]}
+                style={[styles.child, {width: windowWidth / 3.7}]}
                 source={{uri: image.path}}
                 key={index.toString()}
               />

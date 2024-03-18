@@ -84,7 +84,7 @@ const RetrieveImage: React.FC = () => {
         <DropDown onSelect={selectCategory} fetchType="category" />
         <TouchableOpacity onPress={fetchImages}>
           <Text style={styles.retrieveBtn}>Retrieve Image</Text>
-          {isLoading && <ActivityIndicator size="large" color="#0000ff" />}
+          {isLoading && <ActivityIndicator size="large" color="black" />}
         </TouchableOpacity>
         <View style={styles.parent}>
           {images.map((itemm, index) => (
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   childContainer: {
-    width: '33.333%',
+    width: '30%',
     aspectRatio: 1,
     margin: 5,
   },

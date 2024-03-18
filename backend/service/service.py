@@ -1,15 +1,10 @@
 from fastapi import HTTPException, UploadFile,Form
-from fastapi.responses import JSONResponse
 from config import AppConfig
 import base64
-import json
 import binascii
 import requests
-from pydantic import BaseModel
-from typing import List 
 from database.database import collectionMeta,collectionResult
 from ciaos import save
-from typing import List 
 from models.model import Feedback,Metadata
 
 def test_model_v1(base64_str: str, model_name: str):
@@ -28,16 +23,24 @@ def test_model_v1(base64_str: str, model_name: str):
     except (ValueError, requests.exceptions.RequestException) as e:
         raise HTTPException(status_code=500, detail=f"Error sending request to MAS service: {str(e)}")
 
+
 def test_model_v2(file: UploadFile):
     try:
         files = {'file': (file.filename, file.file.read(), file.content_type)}
-        response = requests.post(f"{AppConfig.MAS_SERVICE_URL}{AppConfig.MAS_SERVICE_ENDPOINT}", files=files)
+        masResponse = requests.post(f"{AppConfig.MAS_SERVICE_URL}{AppConfig.MAS_SERVICE_ENDPOINT}", files=files)
         
+        binary_data = file.file.read()
+        encoded = binascii.b2a_base64(binary_data, newline=False)
+        base64_string = encoded.decode('utf-8')
+       
+        response = save(AppConfig.STORAGE_BASE_URL, "", base64_string)
+        json_response = response.json()
+        key = json_response.get('key') 
 
-        if response.status_code == 200:
+        if masResponse.status_code == 200:
             try:
-                result = response.json()
-                return "No" if result == 0 else "Yes" 
+                result = masResponse.json()
+                return {"apiResult": "No" if result == 0 else "Yes", "imageKey": key}
             except ValueError:
                 return {"error": "Failed to parse JSON response"}
         else:
@@ -45,6 +48,7 @@ def test_model_v2(file: UploadFile):
         
     except Exception as e:
         return {"error": f"Failed to complete the request: {str(e)}"}
+
 
 def createFeedback(feedback: Feedback):
     try:
@@ -62,16 +66,3 @@ def fetch_metadata(query):
         return data
     except Exception as e:
          return {"error": f"Failed to fetch metadata: {str(e)}"}
-
-
-def fetch_image_metadata(binary_data: bytes) -> str:
-    try:
-        encoded = binascii.b2a_base64(binary_data, newline=False)
-        base64_string = encoded.decode('utf-8')
-       
-        response = save(AppConfig.STORAGE_BASE_URL, "", base64_string)
-        json_response = response.json()
-        key = json_response.get('key') 
-        return key
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))

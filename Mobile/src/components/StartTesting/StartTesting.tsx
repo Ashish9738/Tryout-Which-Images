@@ -103,34 +103,16 @@ const StartTesting: React.FC = () => {
         },
       });
 
-      const {data} = fileResponse;
-      console.log(data);
+      const {apiResult, imageKey, error} = fileResponse.data;
 
-      if (data && !data.error) {
-        setApiResults(data);
-
-        const formDataKey = new FormData();
-        const image = selectedImages[0];
-
-        formDataKey.append('image', {
-          uri: image.path,
-          type: image.mime,
-          name: image.filename || 'image.jpg',
-        });
-
-        const response = await axios.post(`${api}/key`, formDataKey, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        const metadata = response.data;
-        setFetchMetadata(metadata);
+      if (!error) {
+        setApiResults(apiResult);
+        setFetchMetadata(imageKey);
         setApiResultsLoaded(true);
       } else {
         Alert.alert(
           'Error',
-          data.error || 'Failed to submit test. Please try again.',
+          error || 'Failed to submit test. Please try again.',
         );
       }
       setIsLoading(false);
