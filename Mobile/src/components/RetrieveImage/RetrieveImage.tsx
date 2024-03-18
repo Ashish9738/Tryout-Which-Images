@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 12,
     marginTop: 10,
+    marginBottom: 15,
   },
   parent: {
     flexDirection: 'row',

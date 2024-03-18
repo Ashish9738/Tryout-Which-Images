@@ -14,9 +14,15 @@ interface FeedbackProps {
   model: string;
   imageKey: string;
   apiResponse: string;
+  onFeedbackSubmit: () => void; // Define type for callback function
 }
 
-const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
+const Feedback: React.FC<FeedbackProps> = ({
+  model,
+  imageKey,
+  apiResponse,
+  onFeedbackSubmit,
+}) => {
   const [questions, setQuestions] = useState<string[]>([]);
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
@@ -86,7 +92,12 @@ const Feedback: React.FC<FeedbackProps> = ({model, imageKey, apiResponse}) => {
       }
       console.log('Feedback sent to server:', selectedOptions);
       setSelectedOptions({});
-      Alert.alert('Success', 'Feedback submitted successfully');
+      Alert.alert('Success', 'Feedback submitted successfully', [
+        {
+          text: 'OK',
+          onPress: onFeedbackSubmit, // Call the callback function
+        },
+      ]);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       Alert.alert('Error', 'Failed to submit feedback. Please try again.');

@@ -16,6 +16,7 @@ import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
 import * as RNFS from 'react-native-fs';
 import DropDown from '../DropDown/DropDown';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const AddImage: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
@@ -25,31 +26,28 @@ const AddImage: React.FC = () => {
   const windowWidth = Dimensions.get('window').width;
 
   useEffect(() => {
-    requestPermissions();
+    requestCameraPermission();
   }, []);
 
-  const requestPermissions = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const grantedCamera = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: 'Camera Permission',
-            message: 'This app needs camera permission to take pictures.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
-        );
-
-        if (grantedCamera === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Camera permissions granted');
-        } else {
-          console.log('Camera permissions denied');
-        }
-      } catch (err) {
-        console.warn(err);
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs camera permission to take pictures.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Camera permission granted');
+      } else {
+        console.log('Camera permission denied');
       }
+    } catch (err) {
+      console.warn(err);
     }
   };
 
@@ -60,9 +58,42 @@ const AddImage: React.FC = () => {
         cropping: true,
       });
 
-      setSelectedImages(prevImages => [...prevImages, ...images]);
+      setSelectedImages(prevSelectedImages => [
+        ...prevSelectedImages,
+        ...images,
+      ]);
+
+      const base64ImagesArray = await Promise.all(
+        images.map(async image => {
+          const filePath =
+            Platform.OS === 'android'
+              ? image.path.replace('file://', '')
+              : image.path;
+          return await RNFS.readFile(filePath, 'base64');
+        }),
+      );
+
+      setBase64Images(prevBase64Images => [
+        ...prevBase64Images,
+        ...base64ImagesArray,
+      ]);
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
+    }
+  };
+
+  const captureImage = async () => {
+    try {
+      const image = await ImagePicker.openCamera({
+        cropping: true,
+      });
+
+      setSelectedImages(prevSelectedImages => [...prevSelectedImages, image]);
+
+      const base64Image = await RNFS.readFile(image.path, 'base64');
+      setBase64Images(prevBase64Images => [...prevBase64Images, base64Image]);
+    } catch (error) {
+      console.log('Camera capture failed.', error);
     }
   };
 
@@ -71,29 +102,25 @@ const AddImage: React.FC = () => {
   };
 
   const uploadImages = async () => {
-    if (!selectedCategory) {
-      Alert.alert('Error', 'Please select a category before uploading images.');
+    await setIsLoading(true);
+
+    if (!selectedImages.length || !selectedCategory) {
+      Alert.alert('Error', 'Please select at least one image and a category.');
+      setIsLoading(false);
       return;
     }
-
-    if (selectedImages.length === 0) {
-      Alert.alert('Error', 'Please select atleast one image to upload.');
-      return;
-    }
-
-    setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('category', selectedCategory);
+      const requestData = new FormData();
+      requestData.append('category', selectedCategory);
 
       base64images.forEach((base64Image, index) => {
-        formData.append('image', base64Image);
+        requestData.append('image', base64Image);
       });
 
       const response = await axios.post(
         'https://which-api.cialabs.tech/uploadfiles/',
-        formData,
+        requestData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -116,9 +143,19 @@ const AddImage: React.FC = () => {
       <View>
         <Text style={styles.heading}>Add Images</Text>
         <DropDown onSelect={selectCategory} fetchType="category" />
-        <TouchableOpacity onPress={selectImages}>
-          <Text style={styles.selectImage}>Select Images</Text>
-        </TouchableOpacity>
+        <View style={styles.imageSelectionContainer}>
+          <TouchableOpacity onPress={captureImage} style={styles.captureImage}>
+            <Text>
+              <Icon name="camera" size={40} color="white" />
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={selectImages} style={styles.selectImage}>
+            <Text>
+              <Icon name="plus" size={40} color="white" />
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <View style={styles.parent}>
           {selectedImages.map((image, index) => (
             <View key={index}>
@@ -150,7 +187,23 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
   },
+  imageSelectionContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
   selectImage: {
+    flex: 1,
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    alignItems: 'center',
+    margin: 10,
+    padding: 10,
+    borderRadius: 12,
+  },
+  captureImage: {
     backgroundColor: '#000000',
     color: 'white',
     fontSize: 20,

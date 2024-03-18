@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import DropDown from '../DropDown/DropDown';
 import {api} from '../../utils/Api';
 import Feedback from '../Feedback/Feedback';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const StartTesting: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>('Choose Model');
@@ -26,9 +27,11 @@ const StartTesting: React.FC = () => {
   const [fetchMetadata, setFetchMetadata] = useState<any>({});
   const [questions, setQuestions] = useState<string[]>([]);
   const [questionsLoaded, setQuestionsLoaded] = useState<boolean>(false);
+  const dropDownRef = useRef<any>(null);
 
   useEffect(() => {
     requestPermissions();
+    fetchQuestions();
   }, []);
 
   const requestPermissions = async () => {
@@ -109,6 +112,7 @@ const StartTesting: React.FC = () => {
         setApiResults(apiResult);
         setFetchMetadata(imageKey);
         setApiResultsLoaded(true);
+        Alert.alert('Success', 'Test submitted successfully!');
       } else {
         Alert.alert(
           'Error',
@@ -122,10 +126,6 @@ const StartTesting: React.FC = () => {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
 
   const fetchQuestions = async () => {
     try {
@@ -145,12 +145,33 @@ const StartTesting: React.FC = () => {
     }
   };
 
+  const handleFeedbackSubmit = () => {
+    setSelectedImages([]);
+    setApiResults({});
+    setApiResultsLoaded(false);
+    setFetchMetadata({});
+    setSelectedModel('Choose Model');
+
+    if (dropDownRef.current) {
+      dropDownRef.current.forceUpdate();
+    }
+  };
+
+  const apiResultsString = JSON.stringify(apiResults);
+  const formattedApiResults = apiResultsString.replace(/"/g, '');
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
       <Text style={styles.heading}>Test the Model</Text>
-      <DropDown onSelect={setSelectedModel} fetchType="model" />
+      <DropDown
+        key={selectedModel}
+        onSelect={setSelectedModel}
+        fetchType="model"
+      />
       <TouchableOpacity onPress={selectImages} style={styles.customButton}>
-        <Text style={styles.customButtonText}>Choose Image</Text>
+        <Text style={styles.customButtonText}>
+          <Icon name="plus" size={40} color="white" />
+        </Text>
       </TouchableOpacity>
       <View style={styles.photo}>
         {selectedImages.map((image, index) => (
@@ -170,16 +191,6 @@ const StartTesting: React.FC = () => {
       {apiResultsLoaded && questionsLoaded && (
         <>
           <View style={styles.container}>
-            <Text style={styles.header}>Image Metadata</Text>
-            <View style={styles.imageMetadata}>
-              <Text>Image saved successfully!</Text>
-              <Text style={{textAlign: 'center'}}>
-                Image key : {fetchMetadata}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.container}>
             <Text style={styles.header}>API Results</Text>
             <View style={styles.table}>
               <View style={styles.row}>
@@ -188,15 +199,20 @@ const StartTesting: React.FC = () => {
               </View>
               <View style={styles.row}>
                 <Text style={styles.cell}>isElephant</Text>
-                <Text style={styles.cell}>{apiResults}</Text>
+                <Text style={styles.cell}>{formattedApiResults}</Text>
               </View>
             </View>
           </View>
 
           <Feedback
             model={selectedModel}
-            imageKey={fetchMetadata}
-            apiResponse={apiResults}
+            imageKey={
+              Object.keys(fetchMetadata).length > 0 ? fetchMetadata : undefined
+            }
+            apiResponse={
+              Object.keys(apiResults).length > 0 ? apiResults : undefined
+            }
+            onFeedbackSubmit={handleFeedbackSubmit}
           />
         </>
       )}
