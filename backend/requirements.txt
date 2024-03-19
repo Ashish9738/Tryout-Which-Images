@@ -1,3 +1,9 @@
 fastapi
 uvicorn
+python-multipart
+Pillow
+ciaos
+requests
+pymongo
 pybase64
+pydantic

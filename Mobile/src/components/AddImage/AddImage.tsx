@@ -57,11 +57,7 @@ const AddImage: React.FC = () => {
         multiple: true,
         cropping: true,
       });
-
-      setSelectedImages(prevSelectedImages => [
-        ...prevSelectedImages,
-        ...images,
-      ]);
+      setSelectedImages(images);
 
       const base64ImagesArray = await Promise.all(
         images.map(async image => {
@@ -72,16 +68,13 @@ const AddImage: React.FC = () => {
           return await RNFS.readFile(filePath, 'base64');
         }),
       );
-
-      setBase64Images(prevBase64Images => [
-        ...prevBase64Images,
-        ...base64ImagesArray,
-      ]);
+      setBase64Images(base64ImagesArray);
     } catch (error) {
       console.log('Image selection cancelled or failed.', error);
     }
   };
 
+  //ignore Image capturing as if now, we are mainly focusing on the issue with - "image being replaced by new image..."
   const captureImage = async () => {
     try {
       const image = await ImagePicker.openCamera({
@@ -106,21 +99,22 @@ const AddImage: React.FC = () => {
 
     if (!selectedImages.length || !selectedCategory) {
       Alert.alert('Error', 'Please select at least one image and a category.');
-      setIsLoading(false);
       return;
     }
 
     try {
-      const requestData = new FormData();
-      requestData.append('category', selectedCategory);
+      const formData = new FormData();
+      formData.append('category', selectedCategory);
 
+      // Append each base64 image to FormData
       base64images.forEach((base64Image, index) => {
-        requestData.append('image', base64Image);
+        formData.append('image', base64Image);
       });
 
+      // Send POST request with FormData
       const response = await axios.post(
         'https://which-api.cialabs.tech/uploadfiles/',
-        requestData,
+        formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
