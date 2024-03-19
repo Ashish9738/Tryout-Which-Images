@@ -5,7 +5,7 @@ import {fetchCategory, fetchModels} from '../../utils/Api';
 
 interface Props {
   onSelect: (model: any) => void;
-  fetchType: 'category' | 'model'; 
+  fetchType: 'category' | 'model';
 }
 
 const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
@@ -78,7 +78,7 @@ const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 10,
+    marginBottom: 11,
   },
   picker: {
     height: 50,

@@ -95,7 +95,7 @@ const Feedback: React.FC<FeedbackProps> = ({
       Alert.alert('Success', 'Feedback submitted successfully', [
         {
           text: 'OK',
-          onPress: onFeedbackSubmit, 
+          onPress: onFeedbackSubmit,
         },
       ]);
     } catch (error) {
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: 'black',
     color: 'white',
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 32,
     borderRadius: 6,
     marginBottom: 20,

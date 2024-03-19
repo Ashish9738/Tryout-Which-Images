@@ -51,6 +51,7 @@ const AddImage: React.FC = () => {
     }
   };
 
+  //TODO : Have to resolve issue with the replacement of older images...
   const selectImages = async () => {
     try {
       const images = await ImagePicker.openPicker({
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     margin: 10,
-    padding: 10,
+    padding: 15,
     borderRadius: 12,
   },
 });

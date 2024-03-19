@@ -297,12 +297,13 @@ const styles = StyleSheet.create({
   submitButtonText: {
     color: 'white',
     fontSize: 19,
+    padding: 2,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   customButton: {
     backgroundColor: 'black',
-    paddingVertical: 15,
+    paddingVertical: 10,
     paddingHorizontal: 24,
     borderRadius: 6,
     marginBottom: 15,
