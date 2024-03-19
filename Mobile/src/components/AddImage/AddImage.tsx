@@ -106,12 +106,10 @@ const AddImage: React.FC = () => {
       const formData = new FormData();
       formData.append('category', selectedCategory);
 
-      // Append each base64 image to FormData
       base64images.forEach((base64Image, index) => {
         formData.append('image', base64Image);
       });
 
-      // Send POST request with FormData
       const response = await axios.post(
         'https://which-api.cialabs.tech/uploadfiles/',
         formData,
