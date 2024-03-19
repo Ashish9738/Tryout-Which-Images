@@ -95,7 +95,7 @@ const Feedback: React.FC<FeedbackProps> = ({
       Alert.alert('Success', 'Feedback submitted successfully', [
         {
           text: 'OK',
-          onPress: onFeedbackSubmit, // Call the callback function
+          onPress: onFeedbackSubmit, 
         },
       ]);
     } catch (error) {

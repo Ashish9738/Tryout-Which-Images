@@ -5,7 +5,7 @@ import {fetchCategory, fetchModels} from '../../utils/Api';
 
 interface Props {
   onSelect: (model: any) => void;
-  fetchType: 'category' | 'model'; // Indicates whether to fetch categories or models
+  fetchType: 'category' | 'model'; 
 }
 
 const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
