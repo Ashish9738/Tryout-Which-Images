@@ -59,6 +59,18 @@ const StartTesting: React.FC = () => {
     }
   };
 
+  const captureImage = async () => {
+    try {
+      const image = await ImagePicker.openCamera({
+        cropping: true,
+      });
+
+      setSelectedImages([image]);
+    } catch (error) {
+      console.log('Camera capture failed.', error);
+    }
+  };
+
   const selectImages = async () => {
     try {
       const images = await ImagePicker.openPicker({
@@ -168,11 +180,6 @@ const StartTesting: React.FC = () => {
         onSelect={setSelectedModel}
         fetchType="model"
       />
-      <TouchableOpacity onPress={selectImages} style={styles.customButton}>
-        <Text style={styles.customButtonText}>
-          <Icon name="plus" size={40} color="white" />
-        </Text>
-      </TouchableOpacity>
       <View style={styles.photo}>
         {selectedImages.map((image, index) => (
           <View key={index}>
@@ -182,6 +189,18 @@ const StartTesting: React.FC = () => {
             />
           </View>
         ))}
+      </View>
+      <View style={styles.imageSelectionContainer}>
+        <TouchableOpacity onPress={captureImage} style={styles.captureImage}>
+          <Text>
+            <Icon name="camera" size={40} color="white" />
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={selectImages} style={styles.selectImage}>
+          <Text>
+            <Icon name="plus" size={40} color="white" />
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
@@ -224,6 +243,7 @@ const StartTesting: React.FC = () => {
 
 const styles = StyleSheet.create({
   scrollViewContainer: {
+    display: 'flex',
     flexGrow: 1,
     backgroundColor: 'white',
     padding: 20,
@@ -235,6 +255,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     width: '100%',
     margin: 0,
+    marginBottom: 10,
   },
   container: {
     marginTop: 20,
@@ -261,6 +282,36 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginLeft: 5,
   },
+  imageSelectionContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  captureImage: {
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    margin: 0,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+  },
+  selectImage: {
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 123,
+    borderRadius: 12,
+    marginLeft: 10,
+    flex: 1,
+  },
+
   submitButton: {
     backgroundColor: 'black',
     paddingVertical: 15,

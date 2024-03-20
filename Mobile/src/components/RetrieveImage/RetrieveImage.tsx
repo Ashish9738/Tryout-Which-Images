@@ -47,6 +47,7 @@ const RetrieveImage: React.FC = () => {
     }
 
     setIsLoading(true);
+    console.log(category);
 
     try {
       const response = await axios.get(

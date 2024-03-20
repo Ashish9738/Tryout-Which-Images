@@ -19,9 +19,13 @@ import DropDown from '../DropDown/DropDown';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const AddImage: React.FC = () => {
-  const [selectedImages, setSelectedImages] = useState<ImageOrVideo[]>([]);
+  const [selectedImages, setSelectedImages] = useState<
+    (ImageOrVideo | {name: string; data: string})[]
+  >([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [base64images, setBase64Images] = useState<string[]>([]);
+  const [base64Images, setBase64Images] = useState<
+    {name: string; data: string}[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const windowWidth = Dimensions.get('window').width;
 
@@ -51,22 +55,28 @@ const AddImage: React.FC = () => {
     }
   };
 
-  //TODO : Have to resolve issue with the replacement of older images...
   const selectImages = async () => {
     try {
       const images = await ImagePicker.openPicker({
         multiple: true,
         cropping: true,
       });
-      setSelectedImages(images);
+
+      const ExistingImages = [...selectedImages, ...images];
+      setSelectedImages(ExistingImages);
 
       const base64ImagesArray = await Promise.all(
-        images.map(async image => {
-          const filePath =
-            Platform.OS === 'android'
-              ? image.path.replace('file://', '')
-              : image.path;
-          return await RNFS.readFile(filePath, 'base64');
+        ExistingImages.map(async image => {
+          let filePath = '';
+          if ('path' in image) {
+            filePath =
+              Platform.OS === 'android'
+                ? image.path.replace('file://', '')
+                : image.path;
+          }
+          const base64String = await RNFS.readFile(filePath, 'base64');
+          const imageName = 'name' in image ? image.name : '';
+          return {name: imageName, data: base64String};
         }),
       );
       setBase64Images(base64ImagesArray);
@@ -75,17 +85,25 @@ const AddImage: React.FC = () => {
     }
   };
 
-  //ignore Image capturing as if now, we are mainly focusing on the issue with - "image being replaced by new image..."
   const captureImage = async () => {
     try {
       const image = await ImagePicker.openCamera({
         cropping: true,
       });
 
-      setSelectedImages(prevSelectedImages => [...prevSelectedImages, image]);
+      const filePath =
+        Platform.OS === 'android'
+          ? image.path.replace('file://', '')
+          : image.path;
+      const base64String = await RNFS.readFile(filePath, 'base64');
 
-      const base64Image = await RNFS.readFile(image.path, 'base64');
-      setBase64Images(prevBase64Images => [...prevBase64Images, base64Image]);
+      const newImage = {name: image.filename, data: base64String};
+
+      setSelectedImages(prevSelectedImages => [
+        ...prevSelectedImages,
+        newImage,
+      ]);
+      setBase64Images(prevBase64Images => [...prevBase64Images, newImage]);
     } catch (error) {
       console.log('Camera capture failed.', error);
     }
@@ -98,30 +116,30 @@ const AddImage: React.FC = () => {
   const uploadImages = async () => {
     await setIsLoading(true);
 
-    if (!selectedImages.length || !selectedCategory) {
+    if (!base64Images.length || !selectedCategory) {
       Alert.alert('Error', 'Please select at least one image and a category.');
       return;
     }
 
     try {
-      const formData = new FormData();
-      formData.append('category', selectedCategory);
+      await Promise.all(
+        base64Images.map(async image => {
+          const formData = new FormData();
+          formData.append('category', selectedCategory);
+          formData.append('image', image.data);
 
-      base64images.forEach((base64Image, index) => {
-        formData.append('image', base64Image);
-      });
-
-      const response = await axios.post(
-        'https://which-api.cialabs.tech/uploadfiles/',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        },
+          const response = await axios.post(
+            'https://which-api.cialabs.tech/uploadfiles/',
+            formData,
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            },
+          );
+          console.log('Image uploaded:', image.name, response);
+        }),
       );
-
-      console.log('Images uploaded', response);
       Alert.alert('Success', 'Images uploaded successfully!');
     } catch (error) {
       console.error('Error uploading images:', error);
@@ -131,11 +149,32 @@ const AddImage: React.FC = () => {
     setIsLoading(false);
   };
 
+  const getImageSource = (
+    image: ImageOrVideo | {name: string; data: string},
+  ): string => {
+    if ('path' in image) {
+      return image.path || '';
+    } else {
+      return 'data:image/jpeg;base64,' + image.data;
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View>
         <Text style={styles.heading}>Add Images</Text>
         <DropDown onSelect={selectCategory} fetchType="category" />
+        <View style={styles.parent}>
+          {selectedImages.map((image, index) => (
+            <View key={index}>
+              <Image
+                style={[styles.child, {width: windowWidth / 3.7}]}
+                source={{uri: getImageSource(image)}}
+                key={index.toString()}
+              />
+            </View>
+          ))}
+        </View>
         <View style={styles.imageSelectionContainer}>
           <TouchableOpacity onPress={captureImage} style={styles.captureImage}>
             <Text>
@@ -149,17 +188,6 @@ const AddImage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.parent}>
-          {selectedImages.map((image, index) => (
-            <View key={index}>
-              <Image
-                style={[styles.child, {width: windowWidth / 3.7}]}
-                source={{uri: image.path}}
-                key={index.toString()}
-              />
-            </View>
-          ))}
-        </View>
         <TouchableOpacity onPress={uploadImages}>
           <Text style={styles.uploadImage}>Upload Images</Text>
           {isLoading && (
@@ -212,6 +240,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     alignContent: 'flex-start',
+    marginBottom: 10,
   },
   child: {
     aspectRatio: 1,
