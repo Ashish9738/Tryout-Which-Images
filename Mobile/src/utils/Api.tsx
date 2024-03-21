@@ -4,7 +4,7 @@ export const fetchCategory = async (): Promise<any[]> => {
   try {
     const response = await fetch(`${api}/metadata?query=category`);
     if (!response.ok) {
-      throw new Error('Failed to fetch odels');
+      throw new Error('Failed to fetch models');
     }
     const data = await response.json();
     console.log(data);
