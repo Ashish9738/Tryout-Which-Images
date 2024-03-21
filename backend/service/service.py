@@ -24,7 +24,6 @@ def test_model_v1(base64_str: str, model_name: str):
     except (ValueError, requests.exceptions.RequestException) as e:
         raise HTTPException(status_code=500, detail=f"Error sending request to MAS service: {str(e)}")
 
-
 def test_model_v2(file: UploadFile):
     try:
         files = {'file': (file.filename, file.file.read(), file.content_type)}
@@ -49,7 +48,6 @@ def test_model_v2(file: UploadFile):
         
     except Exception as e:
         return {"error": f"Failed to complete the request: {str(e)}"}
-
 
 def createFeedback(feedback: Feedback):
     try:

@@ -14,7 +14,7 @@ interface FeedbackProps {
   model: string;
   imageKey: string;
   apiResponse: string;
-  onFeedbackSubmit: () => void; // Define type for callback function
+  onFeedbackSubmit: () => void;
 }
 
 const Feedback: React.FC<FeedbackProps> = ({
@@ -27,7 +27,7 @@ const Feedback: React.FC<FeedbackProps> = ({
   const [selectedOptions, setSelectedOptions] = useState<{
     [key: string]: string;
   }>({});
-  const [loading, setLoading] = useState<boolean>(false); // State for loading animation
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchQuestions();

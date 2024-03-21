@@ -10,13 +10,15 @@ Before you begin, make sure you have the following installed on your development
 
 ### Installing
 
-1. Clone the repository to your local machine:
+### Step 1: Clone the repository
+
+Clone the repository to your local machine:
 
    ```bash
    git clone https://github.com/Ashish9738/Which-Images.git
    ```
 
-### Step 1: Install Dependencies
+### Step 2: Install Dependencies
 
 First, Navigate to frontend.
 
@@ -29,7 +31,7 @@ npm install
 yarn
 ```
 
-### Step 1: Start the Metro Server
+### Step 3: Start the Metro Server
 
 First, you will need to start **Metro**.
 To start Metro, run the following command from the _root_ of your React Native project:
@@ -42,7 +44,7 @@ npm start
 yarn start
 ```
 
-### Step 2: Start your Application
+### Step 4: Start your Application
 
 Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 

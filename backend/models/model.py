@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from typing import List 
 
-
 class QuestionAnswer(BaseModel):
     questionID :str
     answer : str
