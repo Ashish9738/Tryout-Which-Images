@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
     marginTop: 10,
+    paddingBottom: 50,
   },
   childContainer: {
     width: '30%',
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   heading: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 46,
+    fontSize: 42,
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 20,

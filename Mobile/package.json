@@ -1,5 +1,6 @@
 {
   "name": "Which Images",
+  "displayName": "Which Images",
   "version": "0.0.1",
   "private": true,
   "scripts": {
