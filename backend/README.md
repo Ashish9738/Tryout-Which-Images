@@ -1,6 +1,6 @@
-## Getting Started
+# Getting Started
 
-### Usage
+## Usage
 
 - Move the backend directory. i.e "cd backend"
 - Then run the following commands to get started!
