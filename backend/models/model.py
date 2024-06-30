@@ -17,3 +17,4 @@ class Feedback(BaseModel):
 
 class Query(BaseModel):
     query : str
+

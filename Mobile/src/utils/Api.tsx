@@ -1,4 +1,5 @@
-export const api = 'https://which-api.cialabs.tech';
+// export const api = 'https://which-api.cialabs.org';
+export const api = 'http://10.0.2.2:8000';
 
 export const fetchCategory = async (): Promise<any[]> => {
   try {

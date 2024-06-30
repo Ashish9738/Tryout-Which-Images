@@ -51,7 +51,8 @@ const RetrieveImage: React.FC = () => {
 
     try {
       const response = await axios.get(
-        `https://which-api.cialabs.tech/get_images/${category}`,
+
+        `https://which-api.cialabs.org/get_images/${category}`,
       );
 
       if (!Array.isArray(response.data)) {
