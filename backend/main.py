@@ -24,10 +24,7 @@ async def update_file(category: Optional[str] = Form(None), image: List[str] = F
         if category is None:
             raise HTTPException(status_code=400, detail="Category is required")
         
-        if get(AppConfig.STORAGE_BASE_URL, category):
-            update(AppConfig.STORAGE_BASE_URL, category, image)
-        else :
-            save(AppConfig.STORAGE_BASE_URL, category, image)
+        update(AppConfig.STORAGE_BASE_URL, category, image)
 
         return JSONResponse(content={"message": f"Image saved locally at: {category}"}, status_code=200)
     
