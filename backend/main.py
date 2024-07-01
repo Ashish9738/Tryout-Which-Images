@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Query, HTTPException, Form, UploadFile, File
-from service.service import test_model_v1, test_model_v2,createFeedback,Metadata,Feedback, fetch_metadata
+from service.service import test_model_v1, test_model_v2,createFeedback,Feedback, fetch_metadata
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List, Optional
 from config import AppConfig 
-from ciaos import save,get,update
-from models.model import Feedback,Metadata
+from ciaos import get,update
+from models.model import Feedback
 
 app = FastAPI()
 
