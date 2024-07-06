@@ -51,7 +51,6 @@ const RetrieveImage: React.FC = () => {
 
     try {
       const response = await axios.get(
-
         `https://which-api.cialabs.org/get_images/${category}`,
       );
 
@@ -83,7 +82,11 @@ const RetrieveImage: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={{flex: 1}}>
         <Text style={styles.heading}>Retrieve Images</Text>
-        <DropDown onSelect={selectCategory} fetchType="category" />
+        <DropDown
+          onSelect={selectCategory}
+          fetchType="category"
+          selectedModel={''}
+        />
         <TouchableOpacity onPress={fetchImages}>
           <Text style={styles.retrieveBtn}>Retrieve Image</Text>
           {isLoading && <ActivityIndicator size="large" color="black" />}

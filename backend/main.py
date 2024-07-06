@@ -20,14 +20,10 @@ app.add_middleware(
 @app.post("/uploadfiles/")
 async def update_file(category: Optional[str] = Form(None), image: List[str] = Form(...)):
     try:
-
         if category is None:
-            raise HTTPException(status_code=400, detail="Category is required")
-        
+            raise HTTPException(status_code=400, detail="Category is required")   
         update(AppConfig.STORAGE_BASE_URL, category, image)
-
         return JSONResponse(content={"message": f"Image saved locally at: {category}"}, status_code=200)
-    
     except HTTPException as e:
         return JSONResponse(content={"error": str(e.detail)}, status_code=e.status_code)
 
@@ -36,7 +32,6 @@ async def get_images(category: str):
     try:
         images = get(AppConfig.STORAGE_BASE_URL, category)
         return images
-    
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -106,19 +106,21 @@ const StartTesting: React.FC = () => {
       const formData = new FormData();
       const image = selectedImages[0];
 
-      formData.append('file', {
-        uri: image.path,
-        type: image.mime,
-        name: image.filename || 'image.jpg',
-      });
+      const response = await fetch(image.path);
+      const blob = await response.blob();
 
-      const fileResponse = await axios.post(`${api}/test_model_v2`, formData, {
+      formData.append('file', blob, image.filename || 'image.jpg');
+
+      const fileResponse = await fetch(`${api}/test_model_v2`, {
+        method: 'POST',
+        body: formData,
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      const {apiResult, imageKey, error} = fileResponse.data;
+      const fileResponseJson = await fileResponse.json();
+      const {apiResult, imageKey, error} = fileResponseJson;
 
       if (!error) {
         setApiResults(apiResult);
@@ -172,13 +174,18 @@ const StartTesting: React.FC = () => {
   const apiResultsString = JSON.stringify(apiResults);
   const formattedApiResults = apiResultsString.replace(/"/g, '');
 
+  const handleModelSelect = (model: string) => {
+    setSelectedModel(model);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
       <Text style={styles.heading}>Test the Model</Text>
       <DropDown
         key={selectedModel}
-        onSelect={setSelectedModel}
+        onSelect={handleModelSelect}
         fetchType="model"
+        selectedModel={selectedModel}
       />
       <View style={styles.photo}>
         {selectedImages.map((image, index) => (

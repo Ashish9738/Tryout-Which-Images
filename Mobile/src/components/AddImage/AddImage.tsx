@@ -129,7 +129,7 @@ const AddImage: React.FC = () => {
           formData.append('image', image.data);
 
           const response = await axios.post(
-            'http://10.0.2.2:8000/uploadfiles/',
+            'https://which-api.cialabs.org/uploadfiles/',
             formData,
             {
               headers: {
@@ -163,7 +163,11 @@ const AddImage: React.FC = () => {
     <ScrollView style={styles.container}>
       <View>
         <Text style={styles.heading}>Add Images</Text>
-        <DropDown onSelect={selectCategory} fetchType="category" />
+        <DropDown
+          onSelect={selectCategory}
+          fetchType="category"
+          selectedModel={''}
+        />
         <View style={styles.parent}>
           {selectedImages.map((image, index) => (
             <View key={index}>

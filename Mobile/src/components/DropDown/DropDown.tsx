@@ -4,13 +4,16 @@ import {Picker} from '@react-native-picker/picker';
 import {fetchCategory, fetchModels} from '../../utils/Api';
 
 interface Props {
-  onSelect: (model: any) => void;
+  onSelect: (model: string) => void;
   fetchType: 'category' | 'model';
+  selectedModel: string;
 }
 
-const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
+const DropDown: React.FC<Props> = ({onSelect, fetchType, selectedModel}) => {
   const [options, setOptions] = useState<any[]>([]);
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [selectedOption, setSelectedOption] = useState<string | null>(
+    selectedModel,
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -20,6 +23,10 @@ const DropDown: React.FC<Props> = ({onSelect, fetchType}) => {
       fetchModelsData();
     }
   }, [fetchType]);
+
+  useEffect(() => {
+    setSelectedOption(selectedModel);
+  }, [selectedModel]);
 
   const fetchCategories = async () => {
     try {
