@@ -106,21 +106,19 @@ const StartTesting: React.FC = () => {
       const formData = new FormData();
       const image = selectedImages[0];
 
-      const response = await fetch(image.path);
-      const blob = await response.blob();
+      formData.append('file', {
+        uri: image.path,
+        type: image.mime,
+        name: image.filename || 'image.jpg',
+      });
 
-      formData.append('file', blob, image.filename || 'image.jpg');
-
-      const fileResponse = await fetch(`${api}/test_model_v2`, {
-        method: 'POST',
-        body: formData,
+      const fileResponse = await axios.post(`${api}/test_model_v2`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      const fileResponseJson = await fileResponse.json();
-      const {apiResult, imageKey, error} = fileResponseJson;
+      const {apiResult, imageKey, error} = fileResponse.data;
 
       if (!error) {
         setApiResults(apiResult);
@@ -318,7 +316,6 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
   },
-
   submitButton: {
     backgroundColor: 'black',
     paddingVertical: 15,
