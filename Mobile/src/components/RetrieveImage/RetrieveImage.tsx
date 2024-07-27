@@ -118,9 +118,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   retrieveBtn: {
+    flex: 1,
     backgroundColor: 'black',
     color: 'white',
-    width: 372,
     alignItems: 'center',
     fontSize: 20,
     fontWeight: 'bold',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   parent: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     marginTop: 10,
     paddingBottom: 50,
   },

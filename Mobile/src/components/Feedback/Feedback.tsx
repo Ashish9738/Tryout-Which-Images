@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 32,
     borderRadius: 6,
-    marginBottom: 20,
+    marginBottom: 30,
     marginTop: 15,
     width: '100%',
     marginLeft: 'auto',

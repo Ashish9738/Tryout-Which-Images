@@ -14,9 +14,9 @@ import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import axios from 'axios';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import DropDown from '../DropDown/DropDown';
-import {api} from '../../utils/Api';
 import Feedback from '../Feedback/Feedback';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { api } from '../../utils/Api';
 
 const StartTesting: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState<string>('Choose Model');
@@ -177,81 +177,127 @@ const StartTesting: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-      <Text style={styles.heading}>Test the Model</Text>
-      <DropDown
-        key={selectedModel}
-        onSelect={handleModelSelect}
-        fetchType="model"
-        selectedModel={selectedModel}
-      />
-      <View style={styles.photo}>
-        {selectedImages.map((image, index) => (
-          <View key={index}>
-            <Image
-              source={{uri: image.path}}
-              style={{width: 110, height: 110, margin: 5}}
-            />
+    <ScrollView style={styles.wrapper}>
+      <View>
+        <Text style={styles.heading}>Test the Model</Text>
+        <DropDown
+          key={selectedModel}
+          onSelect={handleModelSelect}
+          fetchType="model"
+          selectedModel={selectedModel}
+        />
+        <View style={styles.photo}>
+          {selectedImages.map((image, index) => (
+            <View key={index}>
+              <Image
+                source={{uri: image.path}}
+                style={{width: 110, height: 110, margin: 5}}
+              />
+            </View>
+          ))}
+        </View>
+        <View style={styles.imageSelectionContainer}>
+          <View style={styles.CaptureButtonWrapper}>
+            <TouchableOpacity
+              onPress={captureImage}
+              style={styles.captureImage}>
+              <Text>
+                <Icon name="camera" size={40} color="white" />
+              </Text>
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
-      <View style={styles.imageSelectionContainer}>
-        <TouchableOpacity onPress={captureImage} style={styles.captureImage}>
-          <Text>
-            <Icon name="camera" size={40} color="white" />
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={selectImages} style={styles.selectImage}>
-          <Text>
-            <Icon name="plus" size={40} color="white" />
-          </Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.SelectImageBtnWrapper}>
+            <TouchableOpacity onPress={selectImages} style={styles.selectImage}>
+              <Text>
+                <Icon name="plus" size={40} color="white" />
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-        <Text style={styles.submitButtonText}>Submit Test</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+          <Text style={styles.submitButtonText}>Submit Test</Text>
+        </TouchableOpacity>
 
-      {apiResultsLoaded && questionsLoaded && (
-        <>
-          <View style={styles.container}>
-            <Text style={styles.header}>API Results</Text>
-            <View style={styles.table}>
-              <View style={styles.row}>
-                <Text style={[styles.cell, styles.headerCell]}>Parameter</Text>
-                <Text style={[styles.cell, styles.headerCell]}>Value</Text>
-              </View>
-              <View style={styles.row}>
-                <Text style={styles.cell}>isElephant</Text>
-                <Text style={styles.cell}>{formattedApiResults}</Text>
+        {apiResultsLoaded && questionsLoaded && (
+          <>
+            <View style={styles.container}>
+              <Text style={styles.header}>API Results</Text>
+              <View style={styles.table}>
+                <View style={styles.row}>
+                  <Text style={[styles.cell, styles.headerCell]}>
+                    Parameter
+                  </Text>
+                  <Text style={[styles.cell, styles.headerCell]}>Value</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.cell}>isElephant</Text>
+                  <Text style={styles.cell}>{formattedApiResults}</Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          <Feedback
-            model={selectedModel}
-            imageKey={
-              Object.keys(fetchMetadata).length > 0 ? fetchMetadata : undefined
-            }
-            apiResponse={
-              Object.keys(apiResults).length > 0 ? apiResults : undefined
-            }
-            onFeedbackSubmit={handleFeedbackSubmit}
-          />
-        </>
-      )}
+            <Feedback
+              model={selectedModel}
+              imageKey={
+                Object.keys(fetchMetadata).length > 0
+                  ? fetchMetadata
+                  : undefined
+              }
+              apiResponse={
+                Object.keys(apiResults).length > 0 ? apiResults : undefined
+              }
+              onFeedbackSubmit={handleFeedbackSubmit}
+            />
+          </>
+        )}
 
-      {isLoading && <ActivityIndicator size="large" color="black" />}
+        {isLoading && <ActivityIndicator size="large" color="black" />}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollViewContainer: {
-    display: 'flex',
-    flexGrow: 1,
+  wrapper: {
+    flex: 1,
     backgroundColor: 'white',
     padding: 20,
+  },
+  imageSelectionContainer: {
+    flexDirection: 'row',
+  },
+  CaptureButtonWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  SelectImageBtnWrapper: {
+    flex: 1,
+  },
+  selectImage: {
+    flex: 1,
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginLeft: 10,
+    padding: 10,
+    borderRadius: 12,
+  },
+  captureImage: {
+    backgroundColor: '#000000',
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    marginRight: 10,
+    padding: 10,
+    borderRadius: 12,
   },
   photo: {
     flexDirection: 'row',
@@ -286,35 +332,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginRight: 8,
     marginLeft: 5,
-  },
-  imageSelectionContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-  },
-  captureImage: {
-    backgroundColor: '#000000',
-    color: 'white',
-    fontSize: 20,
-    margin: 0,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-  },
-  selectImage: {
-    backgroundColor: '#000000',
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 123,
-    borderRadius: 12,
-    marginLeft: 10,
-    flex: 1,
   },
   submitButton: {
     backgroundColor: 'black',
